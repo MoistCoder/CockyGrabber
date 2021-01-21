@@ -1,3 +1,5 @@
+#### 💣 Old CockyGrabber got deleted by TheBackdoor - Made by TheBackdoor and me 💣
+
 # CockyGrabber
 A Browser Cookies & Passwords Grabber C#.NET Library that you can itegrate in your Projects.
 *(More Supported Browsers in Future!)*
