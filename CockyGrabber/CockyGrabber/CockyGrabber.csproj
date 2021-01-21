@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>TheBackdoor</Authors>
+    <Company>Void</Company>
+    <Description>CockyGrabber is a Browser Cookie Grabber C#.NET Library.</Description>
+    <PackageTags>cookie, cock, hack, hacks, lol, lmao, lmfao, LLLMFAO, however, ok, so, lemme, do, wait, a, sec, bruh, ohk, cya,</PackageTags>
+    <PackageReleaseNotes>I dont give a fuck</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/TheBackdoor/CockyGrabber</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BouncyCastle" Version="1.8.6.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.113.1" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.7.0" />
+  </ItemGroup>
+
+</Project>
