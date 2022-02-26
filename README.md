@@ -53,11 +53,11 @@ foreach(Chromium.Cookie cookie in cookies) // Since Chrome is a Chromium-based B
 }
 ```
 
-*To collect OperaGx, Brave or Edge Cookies just replace `ChromeGrabber` with `OperaGxGrabber`, `BraveGrabber`, and so on.*
+*To collect the Cookies of any othe Chromium-based Browser just replace `ChromeGrabber` with `OperaGxGrabber`, `BraveGrabber`, and so on...*
 
 </br>
 
-Browsers such as Firefox, which are based on other engines have their own classes, such as 'Firefox.Cookie' since they aren't Chromium-based:
+Browsers like Firefox, which are based on other engines have their own classes, such as 'Firefox.Cookie' since they aren't Chromium-based:
 
 ```cs
 FirefoxGrabber grabber = new FirefoxGrabber(); // Define Grabber
@@ -78,7 +78,6 @@ foreach(Firefox.Cookie cookie in cookies) // Firefox has its own engine and ther
 CockyGrabber can also grab Login Data such as Usernames and Passwords.
 
 Here is an example with the `BraveGrabber()`:
-
 
 ```cs
 BraveGrabber grabber = new BraveGrabber(); // Define Grabber
@@ -112,10 +111,15 @@ foreach(Firefox.Login login in logins)
 
 ## What's Next
 
-1. Adding more Browsers
-2. Turn CockyGrabber into a NuGet Package
-3. Adding custom Functions that replace the packages
-4. Creating a minimalized File that anyone can easily implement in their Project without referencing CockyGrabber itself
+1. Adding a Function that can grab all the data at once
+2. Adding more things to grab like bookmarks, extensions, ...
+3. Async Funtions
+4. Turn CockyGrabber into a NuGet Package
+5. Adding custom Functions that replace the packages
+6. Creating a minimalized File that anyone can easily implement in their Project without referencing CockyGrabber itself
+7. Migrate to NET Core
+8. Create a better documentation
+9. More Examples
 
 ## End
 
