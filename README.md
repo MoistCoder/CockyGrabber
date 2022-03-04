@@ -1,6 +1,6 @@
 # CockyGrabber
 
-CockyGrabber is a C#.NET library for collecting browser information such as cookies, logins, and more.
+CockyGrabber is a C# library for the collection of browser information such as cookies, logins, and more.
 It's also very *easy* to integrate into your Projects.
 
 ## Table Of Contents
@@ -17,7 +17,6 @@ It's also very *easy* to integrate into your Projects.
 
 Before you can use CockyGrabber you will need to download a few necessary packages. You can get them from external sources or easily with [NuGet](https://www.nuget.org/):
 
-* [Newtonsoft.Json](https://www.newtonsoft.com/json)
 * [BouncyCastle](http://www.bouncycastle.org/csharp/)
 * [System.Data.SQLite](https://system.data.sqlite.org/)
 * [System.Security.Cryptography.ProtectedData](http://www.dot.net/)
@@ -53,7 +52,7 @@ foreach(Chromium.Cookie cookie in cookies) // Since Chrome is a Chromium-based B
 }
 ```
 
-*To collect the Cookies of any othe Chromium-based Browser just replace `ChromeGrabber` with `OperaGxGrabber`, `BraveGrabber`, and so on...*
+*To collect the Cookies of any other Chromium-based Browser just replace `ChromeGrabber` with `OperaGxGrabber`, `BraveGrabber`, and so on...*
 
 </br>
 
@@ -63,7 +62,7 @@ Browsers like Firefox, which are based on other engines have their own classes, 
 FirefoxGrabber grabber = new FirefoxGrabber(); // Define Grabber
 List<Firefox.Cookie> cookies = grabber.GetCookies(); // Collect all Cookies with GetCookies()
 
-// Print Hostname, Name and Value of every cookie:
+// Print Hostname, Name, and Value of every cookie:
 foreach(Firefox.Cookie cookie in cookies) // Firefox has its own engine and therefore its own Cookie class (Firefox.Cookie)
 {
     string cookieHostname = cookie.Host;
@@ -111,15 +110,16 @@ foreach(Firefox.Login login in logins)
 
 ## What's Next
 
-1. Adding a Function that can grab all the data at once
-2. Adding more things to grab like bookmarks, extensions, ...
-3. Async Funtions
-4. Turn CockyGrabber into a NuGet Package
-5. Adding custom Functions that replace the packages
-6. Creating a minimalized File that anyone can easily implement in their Project without referencing CockyGrabber itself
-7. Migrate to NET Core
-8. Create a better documentation
-9. More Examples
+1. Adding more things to grab like bookmarks, credit cards, extensions, ...
+2. Async Funtions
+3. Turn CockyGrabber into a NuGet Package
+4. Adding custom Functions that replace the packages
+5. Creating a minimalized File that anyone can easily implement in their Project without referencing CockyGrabber itself
+6. Migrate to NET Core
+7. Create a better documentation
+8. Improving the in-code documentation
+9. Create something like a `UniversalCookie` which would replace `Chromium.Cookie` and `Firefox.Cookie` *(Same thing goes for Logins)*
+10. Making the `UniversalGrabber` less confusing
 
 ## End
 

