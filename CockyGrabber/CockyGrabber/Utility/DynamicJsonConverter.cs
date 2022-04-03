@@ -130,6 +130,22 @@ namespace CockyGrabber.Utility
 
             private static object WrapResultObject(object result)
             {
+                IDictionary<string, object> dictionary = result as IDictionary<string, object>;
+                if (dictionary != null)
+                    return new DynamicJsonObject(dictionary);
+
+                ArrayList arrayList = result as ArrayList;
+                if (arrayList != null && arrayList.Count > 0)
+                {
+                    return arrayList[0] is IDictionary<string, object>
+                        ? new List<object>(arrayList.Cast<IDictionary<string, object>>().Select(x => new DynamicJsonObject(x)))
+                        : new List<object>(arrayList.Cast<object>());
+                }
+
+                return result;
+            }
+            private static object _WrapResultObject(object result)
+            {
                 var dictionary = result as IDictionary<string, object>;
                 if (dictionary != null)
                     return new DynamicJsonObject(dictionary);

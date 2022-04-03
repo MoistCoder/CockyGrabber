@@ -69,24 +69,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Chromium\Chromium.cs" />
-    <Compile Include="Exceptions\LoginDatabaseNotFoundException.cs" />
-    <Compile Include="Exceptions\LocalStateDatabaseNotFoundException.cs" />
-    <Compile Include="Exceptions\CookieDatabaseNotFoundException.cs" />
+    <Compile Include="EngineModels\Blink.cs" />
+    <Compile Include="Exceptions\GrabberError.cs" />
+    <Compile Include="Exceptions\GrabberException.cs" />
     <Compile Include="Grabbers\BraveGrabber.cs" />
+    <Compile Include="Grabbers\FirefoxGrabber.cs" />
     <Compile Include="Grabbers\UniversalGrabber.cs" />
     <Compile Include="Grabbers\OperaGrabber.cs" />
     <Compile Include="Grabbers\EdgeGrabber.cs" />
     <Compile Include="Grabbers\VivaldiGrabber.cs" />
-    <Compile Include="Grabbers\ChromiumGrabber.cs" />
+    <Compile Include="EngineGrabbers\BlinkGrabber.cs" />
     <Compile Include="Grabbers\OperaGxGrabber.cs" />
     <Compile Include="Grabbers\ChromeGrabber.cs" />
-    <Compile Include="Grabbers\FirefoxGrabber.cs" />
-    <Compile Include="Firefox\Firefox.cs" />
+    <Compile Include="EngineGrabbers\GeckoGrabber.cs" />
+    <Compile Include="EngineModels\Gecko.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\FirefoxDecryptor.cs" />
     <Compile Include="Utility\DynamicJsonConverter.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Firefox\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />

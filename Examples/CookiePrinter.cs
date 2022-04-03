@@ -13,24 +13,24 @@ namespace CockyGrabberTest
             UniversalGrabber g = new UniversalGrabber(); // Create Grabber
 
             var results = g.GetAllCookies(); // Get ALL Cookies
-            Chromium.Cookie[] chromiumCookies = results.Item1.ToArray(); // Simplify grabbed chromium cookies
-            Firefox.Cookie[] firefoxCookies = results.Item2.ToArray(); // Simplify grabbed firefox cookies
+            Blink.Cookie[] chromiumCookies = results.Item1.ToArray(); // Simplify grabbed Blink/Chromium cookies
+            Gecko.Cookie[] firefoxCookies = results.Item2.ToArray(); // Simplify grabbed Gecko cookies
 
-            // Show chromium cookies:
-            Console.WriteLine("CHROMIUM COOKIES:");
+            // Show Blink/Chromium cookies:
+            Console.WriteLine("BLINK/CHROMIUM COOKIES:");
             foreach (var cg in chromiumCookies)
             {
                 // Print the hostname, name, and value of the cookie:
                 Console.WriteLine();
                 Console.WriteLine($"Hostname: {cg.HostKey}");
                 Console.WriteLine($"Name: {cg.Name}");
-                Console.WriteLine($"EncValue: {cg.EncryptedValue}");
+                Console.WriteLine($"Value: {cg.DecryptedValue}");
             }
 
             Console.WriteLine();
 
-            // Show firefox cookies:
-            Console.WriteLine("FIREFOX COOKIES:");
+            // Show Gecko cookies:
+            Console.WriteLine("GECKO COOKIES:");
             foreach (var cg in firefoxCookies)
             {
                 // Print the hostname, name, and value of the cookie:

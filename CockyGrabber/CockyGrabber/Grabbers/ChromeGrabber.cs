@@ -2,23 +2,23 @@
 
 namespace CockyGrabber.Grabbers
 {
-    public class ChromeGrabber : ChromiumGrabber
+    public class ChromeGrabber : BlinkGrabber
     {
-        public override string ChromiumBrowserCookiePath
+        public override string CookiePath
         {
             get
             {
                 return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Network\\Cookies";
             }
         }
-        public override string ChromiumBrowserLocalStatePath
+        public override string LocalStatePath
         {
             get
             {
                 return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\Google\\Chrome\\User Data\\Local State";
             }
         }
-        public override string ChromiumBrowserLoginDataPath
+        public override string LoginDataPath
         {
             get
             {

