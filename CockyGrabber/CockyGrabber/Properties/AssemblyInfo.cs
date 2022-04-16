@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
 [assembly: AssemblyTitle("CockyGrabber")]
-[assembly: AssemblyDescription("C# library for the collection of browser information such as cookies, logins, and more")]
+[assembly: AssemblyDescription("C# library for the collection of browser information such as cookies, logins, bookmarks and more")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Void")]
 [assembly: AssemblyProduct("CockyGrabber")]
@@ -33,6 +33,6 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder Standardwerte für die Build- und Revisionsnummern verwenden,
 // indem Sie "*" wie unten gezeigt eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.2.0.0")]
-[assembly: AssemblyFileVersion("2.2.0.0")]
+[assembly: AssemblyVersion("2.3.0.0")]
+[assembly: AssemblyFileVersion("2.3.0.0")]
 [assembly: NeutralResourcesLanguage("en")]

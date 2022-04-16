@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CockyGrabber
+﻿namespace CockyGrabber
 {
     public enum GrabberError
     {
@@ -13,6 +7,9 @@ namespace CockyGrabber
         // IO-Exceptions:
         CookiesNotFound,
         LoginsNotFound,
+        HistoryNotFound,
+        BookmarksNotFound,
+        DownloadsNotFound,
         LocalStateNotFound,
         MozGlueNotFound,
         Nss3NotFound,

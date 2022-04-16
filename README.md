@@ -1,5 +1,14 @@
 # CockyGrabber
 
+<!-- https://raw.githubusercontent.com/CockyGrabber/CockyGrabber/master/CockyGrabber.png -->
+<img src="./docs/ressources/CG_Logo.png"
+    alt="Markdown CockyGrabber icon"
+    style="
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 43%;" />
+
 CockyGrabber is a C# library that simplifies the collection of browser information such as cookies, logins, and more. It is also very *easy* to use and allows you to capture browser information without any special knowledge.
 
 > *CockyGrabber is still in development and will receive future updates*! </br>
@@ -7,34 +16,33 @@ CockyGrabber is a C# library that simplifies the collection of browser informati
 
 ## Documentation: Table Of Contents
 
-1. [Integration](https://github.com/MoistCoder/CockyGrabber/wiki/Integration)
-2. [Usage](https://github.com/MoistCoder/CockyGrabber/wiki/Usage)
-    * [Importing CockyGrabber](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#importing-cockygrabber)
-    * [Grabbing Cookies](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#grabbing-cookies)
-        * [Grabbing Cookies from Chromium/Blink-based Browsers](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#grabbing-cookies-from-chromiumblink-based-browsers)
-        * [Grabbing Cookies from Gecko-based Browsers](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#grabbing-cookies-from-gecko-based-browsers)
-    * [Grabbing Logins](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#grabbing-logins)
-        * [Grabbing Logins from Chromium/Blink-based Browsers](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#grabbing-logins-from-chromiumblink-based-browsers)
-        * [Grabbing Logins from Gecko-based Browsers](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#grabbing-logins-from-gecko-based-browsers)
-    * [Grabbing data from multiple Browsers](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#grabbing-data-from-multiple-browsers)
-    * [Getting specific data by Headers](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#getting-specific-data-by-headers)
-    * [Catching Exceptions](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#catching-exceptions)
-    * [Adding Custom Browsers](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#adding-custom-browsers)
-        * [CustomBlinkGrabber Example](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#customblinkgrabber-example)
-        * [CustomGeckoGrabber Example](https://github.com/MoistCoder/CockyGrabber/wiki/Usage#customgeckograbber-example)
+* [Usage](./docs/usage.md)
+    1. [Importing CockyGrabber](./docs/usage.md#importing-cockygrabber)
+    2. [Grabbing Cookies](./docs/usage.md#grabbing-cookies)
+        * [Grabbing Cookies from Chromium/Blink-based Browsers](./docs/usage.md#grabbing-cookies-from-chromiumblink-based-browsers)
+        * [Grabbing Cookies from Gecko-based Browsers](./docs/usage.md#grabbing-cookies-from-gecko-based-browsers)
+    3. [Grabbing Logins](./docs/usage.md#grabbing-logins)
+        * [Grabbing Logins from Chromium/Blink-based Browsers](./docs/usage.md#grabbing-logins-from-chromiumblink-based-browsers)
+        * [Grabbing Logins from Gecko-based Browsers](./docs/usage.md#grabbing-logins-from-gecko-based-browsers)
+    4. [Grabbing data from multiple Browsers](./docs/usage.md#grabbing-data-from-multiple-browsers)
+    5. [Getting specific data by Headers](./docs/usage.md#getting-specific-data-by-headers)
+    6. [Catching Exceptions](./docs/usage.md#catching-exceptions)
+    7. [Adding Custom Browsers](./docs/usage.md#adding-custom-browsers)
+        * [CustomBlinkGrabber Example](./docs/usage.md#customblinkgrabber-example)
+        * [CustomGeckoGrabber Example](./docs/usage.md#customgeckograbber-example)
 
 </br>
 
 ## What's Next
 
-1. Adding more things to grab like bookmarks, credit cards, extensions, ...
+1. Adding more things to grab like credit cards, form history, extensions, ...
 2. Async Funtions
 3. Creating an NuGet Package
 4. Adding custom Functions that replace the packages
 5. Creating a minimalized File that anyone can easily implement in their Project without referencing CockyGrabber itself
-6. Improving the in-code documentation
+6. Improving the documentation
 7. Adding support for more browsers
-8. Creating a UnitTest
+8. Creating a UnitTest (maybe?)
 9. Adding Events
 
 ## End

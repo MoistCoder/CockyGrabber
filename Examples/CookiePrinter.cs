@@ -1,7 +1,5 @@
-using CockyGrabber;
 using CockyGrabber.Grabbers;
 using System;
-using System.Linq;
 
 namespace CockyGrabberTest
 {
@@ -12,32 +10,28 @@ namespace CockyGrabberTest
         {
             UniversalGrabber g = new UniversalGrabber(); // Create Grabber
 
-            var results = g.GetAllCookies(); // Get ALL Cookies
-            Blink.Cookie[] chromiumCookies = results.Item1.ToArray(); // Simplify grabbed Blink/Chromium cookies
-            Gecko.Cookie[] firefoxCookies = results.Item2.ToArray(); // Simplify grabbed Gecko cookies
-
             // Show Blink/Chromium cookies:
             Console.WriteLine("BLINK/CHROMIUM COOKIES:");
-            foreach (var cg in chromiumCookies)
+            foreach (var c in g.GetAllBlinkCookies())
             {
                 // Print the hostname, name, and value of the cookie:
                 Console.WriteLine();
-                Console.WriteLine($"Hostname: {cg.HostKey}");
-                Console.WriteLine($"Name: {cg.Name}");
-                Console.WriteLine($"Value: {cg.DecryptedValue}");
+                Console.WriteLine($"Hostname: {c.HostKey}");
+                Console.WriteLine($"Name: {c.Name}");
+                Console.WriteLine($"Value: {c.DecryptedValue}");
             }
 
             Console.WriteLine();
 
             // Show Gecko cookies:
             Console.WriteLine("GECKO COOKIES:");
-            foreach (var cg in firefoxCookies)
+            foreach (var c in g.GetAllGeckoCookies())
             {
                 // Print the hostname, name, and value of the cookie:
                 Console.WriteLine();
-                Console.WriteLine($"Hostname: {cg.Host}");
-                Console.WriteLine($"Name: {cg.Name}");
-                Console.WriteLine($"Value: {cg.Value}");
+                Console.WriteLine($"Hostname: {c.Host}");
+                Console.WriteLine($"Name: {c.Name}");
+                Console.WriteLine($"Value: {c.Value}");
             }
 
             System.Threading.Thread.Sleep(-1); // Pause console

