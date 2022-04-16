@@ -15,9 +15,9 @@ CockyGrabber is a C# library that simplifies the collection of browser informati
 
 * [Usage](./docs/usage.md)
   * [Importing CockyGrabber](./docs/usage.md#importing-cockygrabber)
-  * [Grabbing Cookies](./docs/usage.md#grabbing-cookies)
-    * [Grabbing Cookies from Chromium/Blink-based Browsers](./docs/usage.md#grabbing-cookies-from-chromiumblink-based-browsers)
-    * [Grabbing Cookies from Gecko-based Browsers](./docs/usage.md#grabbing-cookies-from-gecko-based-browsers)
+  * [Grabbing Information](./docs/usage.md#grabbing-information)
+    * [Grabbing Information from Chromium/Blink-based Browsers](./docs/usage.md#grabbing-information-from-chromiumblink-based-browsers)
+    * [Grabbing Information from Gecko-based Browsers](./docs/usage.md#grabbing-information-from-gecko-based-browsers)
   * [Grabbing data from multiple Browsers](./docs/usage.md#grabbing-data-from-multiple-browsers)
   * [Getting specific data by Headers](./docs/usage.md#getting-specific-data-by-headers)
   * [Catching Exceptions](./docs/usage.md#catching-exceptions)
