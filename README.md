@@ -1,13 +1,10 @@
 # CockyGrabber
 
-<!-- https://raw.githubusercontent.com/CockyGrabber/CockyGrabber/master/CockyGrabber.png -->
-<img src="./docs/ressources/CG_Logo.png"
+<p align="center">
+  <img src="./docs/ressources/CG_Logo.png"
     alt="Markdown CockyGrabber icon"
-    style="
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 43%;" />
+    style="width: 39%;" />
+</p>
 
 CockyGrabber is a C# library that simplifies the collection of browser information such as cookies, logins, and more. It is also very *easy* to use and allows you to capture browser information without any special knowledge.
 
