@@ -1,6 +1,5 @@
 # CockyGrabber
 
-<!-- https://raw.githubusercontent.com/CockyGrabber/CockyGrabber/master/CockyGrabber.png -->
 <p align="center">
   <img src="./ressources/CG_Logo.png"
     alt="Markdown CockyGrabber icon"
