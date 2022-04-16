@@ -14,19 +14,16 @@ CockyGrabber is a C# library that simplifies the collection of browser informati
 ## Documentation: Table Of Contents
 
 * [Usage](./docs/usage.md)
-    * [Importing CockyGrabber](./docs/usage.md#importing-cockygrabber)
-    * [Grabbing Cookies](./docs/usage.md#grabbing-cookies)
-        * [Grabbing Cookies from Chromium/Blink-based Browsers](./docs/usage.md#grabbing-cookies-from-chromiumblink-based-browsers)
-        * [Grabbing Cookies from Gecko-based Browsers](./docs/usage.md#grabbing-cookies-from-gecko-based-browsers)
-    * [Grabbing Logins](./docs/usage.md#grabbing-logins)
-        * [Grabbing Logins from Chromium/Blink-based Browsers](./docs/usage.md#grabbing-logins-from-chromiumblink-based-browsers)
-        * [Grabbing Logins from Gecko-based Browsers](./docs/usage.md#grabbing-logins-from-gecko-based-browsers)
-    * [Grabbing data from multiple Browsers](./docs/usage.md#grabbing-data-from-multiple-browsers)
-    * [Getting specific data by Headers](./docs/usage.md#getting-specific-data-by-headers)
-    * [Catching Exceptions](./docs/usage.md#catching-exceptions)
-    * [Adding Custom Browsers](./docs/usage.md#adding-custom-browsers)
-        * [CustomBlinkGrabber Example](./docs/usage.md#customblinkgrabber-example)
-        * [CustomGeckoGrabber Example](./docs/usage.md#customgeckograbber-example)
+  * [Importing CockyGrabber](./docs/usage.md#importing-cockygrabber)
+  * [Grabbing Cookies](./docs/usage.md#grabbing-cookies)
+    * [Grabbing Cookies from Chromium/Blink-based Browsers](./docs/usage.md#grabbing-cookies-from-chromiumblink-based-browsers)
+    * [Grabbing Cookies from Gecko-based Browsers](./docs/usage.md#grabbing-cookies-from-gecko-based-browsers)
+  * [Grabbing data from multiple Browsers](./docs/usage.md#grabbing-data-from-multiple-browsers)
+  * [Getting specific data by Headers](./docs/usage.md#getting-specific-data-by-headers)
+  * [Catching Exceptions](./docs/usage.md#catching-exceptions)
+  * [Adding Custom Browsers](./docs/usage.md#adding-custom-browsers)
+    * [CustomBlinkGrabber Example](./docs/usage.md#customblinkgrabber-example)
+    * [CustomGeckoGrabber Example](./docs/usage.md#customgeckograbber-example)
 
 </br>
 
