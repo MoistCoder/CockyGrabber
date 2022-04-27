@@ -31,13 +31,12 @@ CockyGrabber is a C# library that simplifies the collection of browser informati
 
 1. Adding more things to grab like credit cards, form history, extensions, ...
 2. Async Funtions
-3. Creating an NuGet Package
-4. Adding custom Functions that replace the packages
-5. Creating a minimalized File that anyone can easily implement in their Project without referencing CockyGrabber itself
-6. Improving the documentation
-7. Adding support for more browsers
-8. Creating a UnitTest (maybe?)
-9. Adding Events
+3. Adding custom Functions that replace the packages
+4. Creating a minimalized File that anyone can easily implement in their Project without referencing CockyGrabber itself
+5. Improving the documentation
+6. Adding support for more browsers
+7. Creating a UnitTest (maybe?)
+8. Adding Events
 
 ## End
 
