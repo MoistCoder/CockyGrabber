@@ -9,6 +9,7 @@
         LoginsNotFound,
         HistoryNotFound,
         BookmarksNotFound,
+        WebDataNotFound,
         DownloadsNotFound,
         LocalStateNotFound,
         MozGlueNotFound,

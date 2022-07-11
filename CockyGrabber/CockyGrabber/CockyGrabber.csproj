@@ -77,6 +77,7 @@
     <Compile Include="EngineGrabbers\GeckoGrabber.cs" />
     <Compile Include="Models\Blink\Download.cs" />
     <Compile Include="Models\Blink\Cookie.cs" />
+    <Compile Include="Models\Blink\AutoFill.cs" />
     <Compile Include="Models\Blink\Login.cs" />
     <Compile Include="Models\Blink\Bookmark.cs" />
     <Compile Include="Models\Blink\Site.cs" />
