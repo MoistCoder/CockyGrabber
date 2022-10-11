@@ -21,3 +21,5 @@ CockyGrabber is a C# library that simplifies the collection of browser informati
     * [Adding Custom Browsers](./usage.md#adding-custom-browsers)
         * [CustomBlinkGrabber Example](./usage.md#customblinkgrabber-example)
         * [CustomGeckoGrabber Example](./usage.md#customgeckograbber-example)
+    * [Know Errors](./usage.md#know-error)
+      * [Error Unable to load DLL SQLite.Interop.dll](./usage.md#error-sqlite)

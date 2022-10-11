@@ -9,6 +9,7 @@ using CockyGrabber;
 using CockyGrabber.Grabbers;
 ```
 
+
 ## Grabbing Information
 
 ### Grabbing Information from Chromium/Blink-based Browsers
@@ -217,3 +218,15 @@ public class CustomGeckoGrabber : BlinkGrabber
     }
 }
 ```
+
+## Know Error
+
+A list of easy-to-fix issues
+
+### Error SQLite
+
+Output: `Unable to load DLL SQLite.Interop.dll`
+
+If this error occurs, the nuget package [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite) must be reinstalled. 
+
+To hide the DLL you can use [Costura.Fody](https://www.nuget.org/packages/Costura.Fody).
