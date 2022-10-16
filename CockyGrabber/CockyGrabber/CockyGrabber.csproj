@@ -75,17 +75,19 @@
     <Compile Include="Grabbers\OperaGxGrabber.cs" />
     <Compile Include="Grabbers\ChromeGrabber.cs" />
     <Compile Include="EngineGrabbers\GeckoGrabber.cs" />
+    <Compile Include="Models\Blink\Form.cs" />
     <Compile Include="Models\Blink\CreditCard.cs" />
     <Compile Include="Models\Blink\Download.cs" />
     <Compile Include="Models\Blink\Cookie.cs" />
-    <Compile Include="Models\Blink\AutoFill.cs" />
     <Compile Include="Models\Blink\Login.cs" />
     <Compile Include="Models\Blink\Bookmark.cs" />
     <Compile Include="Models\Blink\Site.cs" />
+    <Compile Include="Models\Gecko\CreditCard.cs" />
     <Compile Include="Models\Gecko\Download.cs" />
     <Compile Include="Models\Gecko\Cookie.cs" />
     <Compile Include="Models\Gecko\Login.cs" />
     <Compile Include="Models\Gecko\Bookmark.cs" />
+    <Compile Include="Models\Gecko\Form.cs" />
     <Compile Include="Models\Gecko\Site.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\Cryptography\Aes256GcmDecryptor.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Utility\Cryptography\DPAPI.cs" />
     <Compile Include="Utility\Cryptography\GeckoDecryptor.cs" />
     <Compile Include="Utility\DynamicJsonConverter.cs" />
+    <Compile Include="Utility\Time.cs" />
     <Compile Include="Utility\Tools.cs" />
   </ItemGroup>
   <ItemGroup />

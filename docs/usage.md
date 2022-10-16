@@ -9,9 +9,9 @@ using CockyGrabber;
 using CockyGrabber.Grabbers;
 ```
 
-## Grabbing Information
+## Grabbing information
 
-### Grabbing Information from Chromium/Blink-based Browsers
+### Grabbing information from Chromium/Blink-based Browsers
 
 Example that shows how to grab Chrome cookies using the `ChromeGrabber`:
 
@@ -20,11 +20,11 @@ ChromeGrabber grabber = new ChromeGrabber(); // Create Grabber
 var cookies = grabber.GetCookies(); // Collect all Cookies with GetCookies()
 
 // Print the Hostname, Name, and Value of every cookie:
-foreach (Blink.Cookie cookie in cookies) // Chrome is Blink based so it uses Blink.Cookie
+foreach (var cookie in cookies)
 {
     string cookieHostname = cookie.HostKey;
     string cookieName = cookie.Name;
-    string cookieValue = cookie.EncryptedValue;
+    string cookieValue = cookie.DecryptedValue;
     Console.WriteLine($"{cookieHostname}: {cookieName} = {cookieValue}");
 }
 ```
@@ -40,7 +40,7 @@ FirefoxGrabber grabber = new FirefoxGrabber(); // Create Grabber
 var cookies = grabber.GetCookies(); // Collect all Cookies with GetCookies()
 
 // Print Hostname, Name, and Value of every cookie:
-foreach (Gecko.Cookie cookie in cookies) // Firefox is Gecko based so it uses Gecko.Cookie
+foreach (var cookie in cookies)
 {
     string cookieHostname = cookie.Host;
     string cookieName = cookie.Name;
@@ -60,7 +60,7 @@ var logins = grabber.GetLogins(); // Collect all Logins with GetLogins()
 var history = grabber.GetHistory(); // Collect all History with GetHistory()
 ```
 
-## Grabbing data from multiple Browsers
+## Grabbing data from multiple browsers
 
 CockyGrabber provides a `UniversalGrabber` which can be used to grab Cookies, Logins, and such from multiple Browsers.</br>
 Here is an example showing how to grab stuff from all Chromium/Blink-browsers:
@@ -87,7 +87,7 @@ var history = grabber.GetAllGeckoHistory(); // Collect the History from all Geck
 var downloads = grabber.GetAllBlinkDownloads(); // Collect the Downloads from all Gecko based browsers
 ```
 
-## Getting specific data by Headers
+## Getting specific data with headers
 
 Say you want to grab the logins of a specific hostname/website; how would you do it?
 You use the `GetLoginsBy()` Method!
@@ -118,7 +118,7 @@ var google_bookmarks = grabber.GetBookmarksBy(Blink.CookieHeader.url, "https://g
 
 There are more headers you can use, but the ones I have listed are the most common ones.
 
-> *(A documentation for the Item Headers such as `Blink.LoginHeader` and `Gecko.CookieHeader` will come in near future)*
+> *(A documentation for the item headers such as `Blink.LoginHeader` and `Gecko.CookieHeader` will come sometime in the future)*
 
 ## Catching Exceptions
 
@@ -152,19 +152,19 @@ catch (GrabberException e)
 
 ## Adding Custom Browsers
 
-If you want to add support for a new browser, you can do it by adding a new grabber class that inherits from `BlinkGrabber` or `GeckoGrabber`. After crating the class you will need to specify the browser's paths to the databases and files.
+If you want to add support for a new browser, you can do it by adding a new grabber class that inherits from `BlinkGrabber` or `GeckoGrabber`. After creating the class you will need to specify the browser's paths to the databases and files.
 
 ### CustomBlinkGrabber Example
 
 ```cs
 public class CustomBlinkGrabber : BlinkGrabber
 {
-    public override string CookiePath
+    public override string DataRootPath
     {
         get
         {
-            // This is the path to the Cookie Database
-            return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\CustomBrowser\\Default\\Cookies";
+            // This is the path to the browser's root directory, which usually contains the browser profile folders and the 'Local State' file
+            return $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\CustomBrowser\\User Data";
         }
     }
     public override string LocalStatePath
@@ -172,31 +172,47 @@ public class CustomBlinkGrabber : BlinkGrabber
         get
         {
             // This is the path to the 'Local State' file of the browser
-            return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\CustomBrowser\\Local State";
+            return $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\CustomBrowser\\User Data\\Local State";
+        }
+    }
+    public override string CookiePath
+    {
+        get
+        {
+            // This is the path to the cookie database from a browser profile directory. (If the browser doesn't support multiple browsers, there are no profile directories, so the path starts from the root of the browser, not the profile folder.)
+            return $"\\Network\\Cookies";
         }
     }
     public override string LoginDataPath
     {
         get
         {
-            // This is the path to the Login Database
-            return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\CustomBrowser\\Default\\Login Data";
+            // This is the path to the login database from a browser profile directory. (If the browser doesn't support multiple browsers, there are no profile directories, so the path starts from the root of the browser, not the profile folder.)
+            return $"\\Login Data";
         }
     }
     public override string HistoryPath
     {
         get
         {
-            // This is the path to the History Database
-            return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\CustomBrowser\\Default\\History";
+            // This is the path to the history database from a browser profile directory. (If the browser doesn't support multiple browsers, there are no profile directories, so the path starts from the root of the browser, not the profile folder.)
+            return $"\\History";
         }
     }
     public override string BookmarkPath
     {
         get
         {
-            // This is the path to the Bookmark Database
-            return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\CustomBrowser\\Default\\Bookmarks";
+            // This is the path to the bookmark database from a browser profile directory. (If the browser doesn't support multiple browsers, there are no profile directories, so the path starts from the root of the browser, not the profile folder.)
+            return $"\\Bookmarks";
+        }
+    }
+    public override string WebDataPath
+    {
+        get
+        {
+            // This is the path to the 'Web Data' database from a browser profile directory. (If the browser doesn't support multiple browsers, there are no profile directories, so the path starts from the root of the browser, not the profile folder.)
+            return $"\\Web Data";
         }
     }
 }
@@ -207,12 +223,12 @@ public class CustomBlinkGrabber : BlinkGrabber
 ```cs
 public class CustomGeckoGrabber : BlinkGrabber
 {
-    public override string ProfilesPath
+    public override string ProfileDirPath
     {
         get
         {
-            // This is the path to the Profiles folder of the browser
-            return $"C:\\Users\\{Environment.UserName}\\AppData\\Local\\CustomBrowser\\Profiles";
+            // This is the path to the browser's 'Profiles' folder/directory, which contains the profile folders
+            return $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\CustomBrowser\\Profiles";
         }
     }
 }

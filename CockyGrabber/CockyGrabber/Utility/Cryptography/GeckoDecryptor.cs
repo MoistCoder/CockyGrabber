@@ -134,7 +134,7 @@ namespace CockyGrabber.Utility.Cryptography
             try
             {
                 byte[] bPassDecoded = Convert.FromBase64String(value); // String from Base64
-
+                
                 lpMemory = Marshal.AllocHGlobal(bPassDecoded.Length); // Allocate some memory
                 Marshal.Copy(bPassDecoded, 0, lpMemory, bPassDecoded.Length); // copy the data of bPassDecoded to lpMemory
 

@@ -1,14 +1,25 @@
 # CockyGrabber
 
+<!-- GITHUB MARKDOWN:
 <p align="center">
-  <img src="./docs/ressources/CG_Logo.png"
+  <img src="./resources/CG_Logo.png"
     alt="Markdown CockyGrabber icon"
     style="width: 39%;" />
 </p>
+-->
+<img src="./resources/CG_Logo.png"
+    alt="Markdown CockyGrabber icon"
+    style="
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 39%;" />
 
-CockyGrabber is a C# library that simplifies the collection of browser information such as cookies, logins, and more. It is also very *easy* to use and allows you to capture browser information without any special knowledge.
+CockyGrabber is a C# library that simplifies the collection of browser information such as cookies, logins, bookmarks, credit cards and more. It is also very *easy* to use and allows you to capture browser information without any special knowledge.
 
-> *CockyGrabber is still in development and will receive future updates*! </br>
+It can be used as a base for your projects like browser information viewers, stealers/grabbers, and more as long as the user/manufacturer of the product using CockyGrabber agrees that the developer(s) of CockyGrabber will not be held responsible for any kind of harm done as it is published for educational purposes and has informational value for browser security research.
+
+> *CockyGrabber is still in development and will receive future updates*!</br>
 > If you got **requests** or find any **bugs**, please open an Issue!
 
 ## Documentation: Table Of Contents
@@ -29,16 +40,16 @@ CockyGrabber is a C# library that simplifies the collection of browser informati
 
 ## What's Next
 
-1. Adding more things to grab like credit cards, form history, extensions, ...
-2. Async Funtions
-3. Adding custom Functions that replace the packages
-4. Creating a minimalized File that anyone can easily implement in their Project without referencing CockyGrabber itself
-5. Improving the documentation
-6. Adding support for more browsers
-7. Creating a UnitTest (maybe?)
-8. Adding Events
+1. Adding more things to grab like saved emails, names, adresses, and extensions.
+2. The Addition of asynchronous funtions
+3. Custom functionality replacing the libraries and packages used by CockyGrabber
+4. The creation of a minimalized file that anyone can easily implement in their Project without referencing CockyGrabber itself **OR** a VS project solution fully set up with all libraries installed, including Cockygrabber, ready to use.
+5. Constant improvement of the documentation
+6. Support for more browsers
+7. Addition of events (maybe)
+8. Eventually migrating from .NET Framework v.4.8 to the newest version of .NET
 
 ## End
 
-That's it for now!</br>
+That's it for now.</br>
 I hope you like this little project! ^^

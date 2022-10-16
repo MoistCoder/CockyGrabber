@@ -73,7 +73,6 @@ namespace CockyGrabber.Utility.Cryptography.BouncyCastle
             return data == null ? null : (byte[])data.Clone();
         }
 
-        [CLSCompliantAttribute(false)]
         public static ulong[] Clone(ulong[] data)
         {
             return data == null ? null : (ulong[])data.Clone();

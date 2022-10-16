@@ -9,12 +9,14 @@
         LoginsNotFound,
         HistoryNotFound,
         BookmarksNotFound,
-        WebDataNotFound,
         DownloadsNotFound,
+        FormHistoryNotFound,
+        CreditCardsNotFound,
         LocalStateNotFound,
         MozGlueNotFound,
         Nss3NotFound,
-        ProfileNotFound,
+        Nss3CouldNotBeLoaded,
+        ProfilesNotFound,
 
         // WinApi:
         AddressNotFound,

@@ -3,7 +3,7 @@ using System;
 
 namespace CockyGrabberTest
 {
-    // This Program collects all Cookies and outputs them in a console window
+    // This Program collects all browser cookies and outputs them in a console window
     class Program
     {
         static void Main(string[] args)

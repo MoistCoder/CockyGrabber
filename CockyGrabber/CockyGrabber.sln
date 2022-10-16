@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31410.357
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CockyGrabber", "CockyGrabber\CockyGrabber.csproj", "{4B568F36-1D92-4937-A8A0-F9960B1F14BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CockyGrabber.Test", "CockyGrabber.Test\CockyGrabber.Test.csproj", "{0BFF3501-EFFF-477A-ACAE-67F79129007D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{4B568F36-1D92-4937-A8A0-F9960B1F14BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B568F36-1D92-4937-A8A0-F9960B1F14BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B568F36-1D92-4937-A8A0-F9960B1F14BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BFF3501-EFFF-477A-ACAE-67F79129007D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BFF3501-EFFF-477A-ACAE-67F79129007D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BFF3501-EFFF-477A-ACAE-67F79129007D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BFF3501-EFFF-477A-ACAE-67F79129007D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
