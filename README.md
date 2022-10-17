@@ -1,7 +1,7 @@
 # CockyGrabber
 
 <p align="center">
-  <img src="./resources/CG_Logo.png"
+  <img src="./docs/resources/CG_Logo.png"
     alt="Markdown CockyGrabber icon"
     style="width: 39%;" />
 </p>
