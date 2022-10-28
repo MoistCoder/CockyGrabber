@@ -307,7 +307,7 @@ namespace CockyGrabber.Grabbers
             {
                 _logins.Add(new Gecko.Login
                 {
-                    Id = obj.id,
+                    Id = (int)obj.id,
                     Hostname = (string)obj.hostname,
                     HttpRealm = (string)obj.httpRealm,
                     FormSubmitURL = (string)obj.formSubmitURL,
