@@ -10,7 +10,7 @@ CockyGrabber is a C# library that simplifies the collection of browser informati
 
 It can be used as a base for your projects like browser information viewers, stealers/grabbers, and more as long as the user/manufacturer of the product using CockyGrabber agrees that the developer(s) of CockyGrabber will not be held responsible for any kind of harm done as it is published for educational purposes and has informational value for browser security research.
 
-> *CockyGrabber is still in development and will receive future updates*!</br>
+> *CockyGrabber remains discontinued as an active project but maintained as a passion project that may receive occasional updates in the future*!</br>
 > If you got **requests** or find any **bugs**, please open an Issue!
 
 ## Documentation: Table Of Contents
